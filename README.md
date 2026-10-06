@@ -1,23 +1,54 @@
 # Agent Skills (`skills`)
 
-Agent skills for authoring, auditing, and iteratively refining technical architecture and Business Analysis (BA) documentation across software projects.
+Agent skills for authoring, auditing, and iteratively refining technical documentation across software projects.
 
 Compatible with **Antigravity (AGY)**, **Codex**, **Claude Code**, and agentic coding workflows supporting `SKILL.md` specifications.
 
 ---
 
-## Skills Catalog
+## Two Distinct Documentation Tracks
 
-| Skill | Category | Description | Key Artifacts |
-| :--- | :--- | :--- | :--- |
-| [`write-docs`](write-docs/SKILL.md) | Standard Documentation | Universal authoring guide for software projects: Business Analysis (BRD, SRS, User Stories) and Technical Architecture (HLD, LLD, API specs, ADRs). | Progressive disclosure, sentence case, 1-3 sentence paragraphs, zero AI fluff. |
-| [`review-docs`](review-docs/SKILL.md) | Standard Review Loop | Dual-lens evaluation loop auditing style/voice and technical accuracy against source code. Uses state tracking (`.reviews/review-<doc>.md`). | Readability, voice, code alignment (`file:line`), triage decision gate (`Improve / Complete / Done`). |
-| [`enterprise-write-docs`](enterprise-write-docs/SKILL.md) | Enterprise Architecture | High-governance documentation guide modeled on empirical tier-1 banking, telecommunications, and mission-critical enterprise systems. | 4-in-1 Unified Spec (PTTKHT), 12-field Use Case Cards, 5D Business Rules (BR-xxx), Data Scope RBAC, Request Journey, Field-level crypto, DB table classification. |
-| [`enterprise-review-docs`](enterprise-review-docs/SKILL.md) | Enterprise Review Loop | Strict audit and verification enforcing enterprise governance, quantified NFRs, scope boundaries, CSDL audit columns, runbook sequences, and acceptance rigor. | Scorecard out of 40, audit checklists for URD, SRS, HLD, LLD, CSDL, HDVH, and Test Matrices. |
+The repository provides two specialized, cleanly differentiated documentation tracks:
+
+```
+┌────────────────────────────────────────┐   ┌────────────────────────────────────────┐
+│     Track 1: Developer & Codebase      │   │    Track 2: Enterprise BA & Gov        │
+│    `write-docs`  &  `review-docs`      │   │`enterprise-write-docs` & `*-review`    │
+├────────────────────────────────────────┤   ├────────────────────────────────────────┤
+│ • Audience: Devs, SDK users, engineers │   │ • Audience: Stakeholders, BA, PO, PM   │
+│ • Focus: Code, APIs, Quickstarts,      │   │ • Focus: URD, SRS, 4-in-1 PTTKHT,      │
+│   Architecture guides, Tech Nuggets    │   │   5D Business Rules, Data Scope RBAC,  │
+│ • Inspiration: tldraw docs-guide       │   │   Crypto, Runbooks, UAT Minutes        │
+│ • Principles: Runnable code, 1-3 paras,│   │ • Principles: Formal sign-off, RTM,    │
+│   progressive disclosure, zero AI fluff│   │   audit columns, legal acceptance      │
+└────────────────────────────────────────┘   └────────────────────────────────────────┘
+```
 
 ---
 
-## Enterprise Templates (`enterprise-write-docs/templates/`)
+## Skills Catalog
+
+| Skill | Track | Primary Purpose | Key Artifacts |
+| :--- | :--- | :--- | :--- |
+| [`write-docs`](write-docs/SKILL.md) | **Developer & Codebase** | Author clean, high-density documentation for software engineers, SDK users, and codebase maintainers. | Quickstarts, API reference tables, codebase architecture guides, code recipes, engineering deep-dives ("nuggets"), ADRs. |
+| [`review-docs`](review-docs/SKILL.md) | **Developer & Codebase** | Dual-lens evaluation loop auditing technical accuracy against repository source code and developer usability. | Code alignment (`file:line`), runnable snippets, 1-3 sentence paragraphs, progressive disclosure, zero AI fluff. |
+| [`enterprise-write-docs`](enterprise-write-docs/SKILL.md) | **Enterprise BA & Gov** | Author high-governance specifications for enterprise banking, telecommunications, and mission-critical systems. | 4-in-1 Unified Spec (PTTKHT), 12-field Use Case Cards, 5D Business Rules (BR-xxx), Data Scope RBAC, Field encryption, CSDL tables. |
+| [`enterprise-review-docs`](enterprise-review-docs/SKILL.md) | **Enterprise BA & Gov** | Strict compliance audit enforcing enterprise governance, quantified NFRs, CSDL audit columns, and operational runbook dependency order. | Scorecard out of 40, audit checklists for URD, SRS, HLD, LLD, CSDL, HDVH, and Test Matrices. |
+
+---
+
+## Track 1: Developer Documentation (`write-docs` / `review-docs`)
+
+Modeled on the engineering principles of the **tldraw docs guide**:
+- **Progressive Disclosure**: Simplest working example first, then configuration, then deep internals and edge cases.
+- **High-Density Scannability**: 1 to 3 sentences per paragraph. Structured tables for parameters, flags, and options.
+- **Runnable Code**: Every snippet must have valid syntax, correct imports, and realistic domain payloads (no `foo`/`bar`).
+- **Technical "Nuggets"**: Engineering deep-dives that frame the hard problem, explain the key insight, walk through the solution as "what we did", and discuss tradeoffs.
+- **Zero Redundancy**: Show complete implementations once; avoid repeating trimmed-down snippets across multiple sections.
+
+---
+
+## Track 2: Enterprise Templates (`enterprise-write-docs/templates/`)
 
 Modular markdown blueprints ready for enterprise project execution:
 
@@ -36,22 +67,17 @@ Modular markdown blueprints ready for enterprise project execution:
 ### 1. Antigravity (AGY)
 Install globally to `~/.gemini/config/skills/`:
 ```bash
-# Copy enterprise skills
+# Developer documentation skills
+cp -r write-docs ~/.gemini/config/skills/
+cp -r review-docs ~/.gemini/config/skills/
+
+# Enterprise BA & Architecture skills
 cp -r enterprise-write-docs ~/.gemini/config/skills/
 cp -r enterprise-review-docs ~/.gemini/config/skills/
 ```
-Or add to a specific project repository at `.agents/skills/`.
 
-### 2. Codex / Claude Code
-Install globally to user skills directory (`~/.codex/skills/` or equivalent):
-```bash
-cp -r enterprise-write-docs ~/.codex/skills/
-cp -r enterprise-review-docs ~/.codex/skills/
-```
-
-### 3. Activating in Chat
-Reference the skill by name or trigger directly:
-- `/write-docs` - Generate specifications or architectural design.
-- `/review-docs <path-to-document>` - Audit and improve existing documentation.
-- `/enterprise-write-docs` - Author enterprise-grade documentation with formal blueprints.
-- `/enterprise-review-docs <path-to-document>` - Audit against enterprise governance and technical rigor.
+### 2. Activating in Chat
+- `/write-docs` - Generate developer guides, API references, architecture docs, or engineering deep-dives.
+- `/review-docs <path>` - Audit developer documentation against repository source code.
+- `/enterprise-write-docs` - Generate enterprise BA specs (BRD/URD/SRS/HLD/CSDL/Runbook/Acceptance).
+- `/enterprise-review-docs <path>` - Audit enterprise specs against governance checklists and quantified NFRs.

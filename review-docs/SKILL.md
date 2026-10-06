@@ -1,11 +1,16 @@
 ---
 name: review-docs
-description: Review, audit, and improve code and BA documentation (BRD, SRS, HLD, LLD, API docs, architecture specs) against standards for technical accuracy, business logic completeness, clarity, and voice. Iterates with tracking and verification.
+description: Review, audit, and improve developer and codebase documentation (Quickstarts, API references, architecture guides, code recipes, engineering deep dives, and ADRs) for code accuracy, clarity, and voice. Iterates with tracking and verification.
 ---
 
-# Review Documentation
+# Review Documentation (Developer & Codebase Docs)
 
-Universal evaluation and iterative refinement workflow for code documentation, architectural specs, and Business Analysis (BA) artifacts across any project.
+Universal evaluation and iterative refinement workflow for developer-facing technical documentation, SDK guides, API contracts, codebase architecture, and engineering deep-dives.
+
+> [!NOTE]
+> **Enterprise BA vs. Developer Doc Reviews**:
+> - Use **`review-docs`** (this skill) to audit developer documentation, SDK articles, API references, codebase architecture guides, and technical deep-dives against source code and developer usability standards.
+> - Use **`enterprise-review-docs`** when auditing formal enterprise Business Analysis (BRD, URD, SRS, 12-field Use Case Cards, 5D Business Rules, Data Scope RBAC, CSDL data dictionaries, Operations Runbooks, or Acceptance Minutes).
 
 **Target**: Target document path (`$ARGUMENTS` or specified file)
 
@@ -23,9 +28,11 @@ Universal evaluation and iterative refinement workflow for code documentation, a
 ┌──────────────────────────────────────────────────────────────┐
 │  2. EVALUATE (Dual-Lens Audit)                               │
 │  ┌─────────────────────────┐   ┌──────────────────────────┐  │
-│  │ Style & Readability     │   │ Content & Accuracy       │  │
-│  │ - Sentence structure    │   │ - Source code alignment  │  │
-│  │ - Voice & AI fluff check│   │ - Business logic & NFRs  │  │
+│  │ Lens A: Style & Voice   │   │ Lens B: Code & Rigor     │  │
+│  │ - 1-3 sentence paras    │   │ - Source code alignment  │  │
+│  │ - Progressive flow      │   │ - Runnable snippets      │  │
+│  │ - Sentence case         │   │ - Type & signature check │  │
+│  │ - Zero AI fluff/tells   │   │ - No duplicate sections  │  │
 │  └─────────────────────────┘   └──────────────────────────┘  │
 └──────────────────────────────────────────────────────────────┘
                                ↓
@@ -77,9 +84,10 @@ Status values: `pending` | `fixed` | `verified-fixed` | `not-fixed` | `wont-fix`
 
 | ID | Category | Location | Issue Description | Source / Reference | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| ISS-001 | Accuracy | Section 3.2 | Endpoint specifies `POST /orders`, but route in `src/routes/order.ts` is `POST /api/v1/orders` | `src/routes/order.ts:24` | pending |
-| ISS-002 | Voice | Section 1 | Contains AI fluff: "In today's fast-paced environment, it is crucial..." | Writing Guidelines | pending |
-| ISS-003 | Completeness | Section 4 | SRS lacks quantifiable NFR for p99 latency | NFR Standards | pending |
+| ISS-001 | Accuracy | Section 2.1 | API parameter `timeout` in doc is actually `timeoutMs` in exported interface | `src/client.ts:42` | pending |
+| ISS-002 | Code | Section 3 | Snippet imports non-existent `@myorg/utils/format`; should be `@myorg/core` | Codebase check | pending |
+| ISS-003 | Redundancy | Section 4.2 | "Common Use Cases" repeats identical code already shown in Section 2 | tldraw Docs Guide | pending |
+| ISS-004 | Voice | Section 1 | Contains AI fluff: "In today's fast-paced environment, it is crucial..." | Writing Guidelines | pending |
 ```
 
 ---
@@ -92,32 +100,38 @@ Evaluate the document across two parallel lenses:
 
 Audit presentation, structure, and tone:
 
-1. **Readability (0-10)**:
-   - Are sentences concise and direct (1-3 sentences per paragraph)?
-   - Are complex concepts introduced progressively (simple to complex)?
-   - Are tables, bullet points, and callouts used for scannability?
-   - Do headings follow sentence case?
+1. **Readability & Scannability (0-10)**:
+   - **Paragraph length**: 1-3 sentences per paragraph maximum. No dense unbroken prose walls.
+   - **Progressive disclosure**: Starts with the simplest working example before introducing complex configuration and internals.
+   - **Structured tables**: API parameters, properties, flags, error codes, and options are in tables, not paragraphs.
+   - **Sentence case headings**: Headings follow sentence case (`Getting started with plugins`, not `Getting Started With Plugins`).
+   - **No redundant sections**: Code examples are not copy-pasted or slightly trimmed across multiple sections.
+
 2. **Voice & Tone (0-10)**:
-   - Is it written in active voice and present tense?
-   - Are assertions confident without unnecessary hedging ("might", "it appears that")?
-   - **Zero AI tells**: Flag hollow filler ("crucial", "harness", "testament", "delve", "seamlessly", formulaic transitions).
-
-### Lens B: Content, Accuracy & Completeness
-
-Audit factual correctness and structural rigor:
-
-1. **Completeness & Coverage (0-10)**:
-   - **BRD / SRS**: Does it define explicit in-scope and out-of-scope boundaries? Are NFRs quantified? Are acceptance criteria testable (Given/When/Then)?
-   - **HLD / LLD**: Does it specify architecture topology, database schemas, API contracts, error codes, and failure modes?
-   - **API / Dev Docs**: Are all required headers, error codes, and payloads documented?
-2. **Accuracy & Real-World Alignment (0-10)**:
-   - **Code verification**: Cross-check documented APIs, function signatures, database models, and file paths against actual source code in the repository. Flag exact `file:line` mismatches.
-   - **Business logic verification**: Check that business rules and calculation formulas are logically consistent and unambiguous.
-   - **Diagram verification**: Ensure Mermaid syntax is valid and flows match described logic.
+   - **Active voice & present tense**: Direct, assertive explanations.
+   - **Zero AI tells**: Flag corporate filler words ("delve", "crucial", "harness", "testament", "seamlessly", formulaic transitions like "In conclusion", "Moreover", "It is important to remember").
+   - **Framing in deep-dives**: Technical nuggets frame the problem and tension first, explain what was built, and avoid prescriptive lecturing.
 
 ---
 
-## Step 3: Summarize Findings
+### Lens B: Code Accuracy & Technical Rigor
+
+Audit technical substance against the codebase:
+
+1. **Source Code Alignment (0-10)**:
+   - Check every code snippet, import statement, and API call against actual repository source code (`file:line`).
+   - Verify that documented function and method signatures match exported types.
+   - Verify that configuration flags, default values, and environment variables exist in the codebase.
+   - Flag drift, deprecated APIs, and phantom parameters.
+
+2. **Runnable Examples & Completeness (0-10)**:
+   - Ensure the primary code example has all required imports and can run standalone.
+   - Verify that payloads and variable names are realistic (no generic `foo`, `bar`, `test1`).
+   - Check that error handling and failure modes are explicitly documented with realistic recovery steps.
+
+---
+
+## Step 3: Summarize Findings & Scorecard
 
 Compile the evaluation findings into a structured scorecard:
 
@@ -125,12 +139,12 @@ Compile the evaluation findings into a structured scorecard:
 ## Evaluation Report: [Document Path]
 
 | Dimension | Score | Primary Finding |
-| :--- | :--- | :--- |
-| **Readability** | X/10 | [Key readability observation] |
-| **Voice & Style** | X/10 | [Tone or AI-fluff finding] |
-| **Completeness** | X/10 | [Coverage / missing sections] |
-| **Accuracy** | X/10 | [Code/logic consistency finding] |
-| **Total** | **X/40** | Passing threshold: 32/40 |
+| :--- | :---: | :--- |
+| **Readability & Scannability** | X/10 | [1-3 sentence paras, tables, progressive disclosure] |
+| **Voice & Tone** | X/10 | [Active voice, zero AI fluff, confident technical tone] |
+| **Code Alignment** | X/10 | [Exact match with exported types and routes in source code] |
+| **Snippet Completeness** | X/10 | [Runnable examples, complete imports, realistic payloads] |
+| **Total** | **X/40** | Passing threshold: 32/40 (Zero P0 accuracy defects) |
 
 ### Priority Fixes
 
@@ -142,11 +156,9 @@ Compile the evaluation findings into a structured scorecard:
 ### User Triage Decision
 
 Ask the user how to proceed:
-- **Improve**: Apply surgical fixes for pending issues, then run a verification pass.
+- **Improve**: Apply surgical fixes for pending issues, then re-evaluate.
 - **Complete and finish**: Apply fixes directly to all pending issues and finalize (skip re-evaluation).
 - **Done**: Exit without modifying the document.
-
-**Triage Rule**: Mark items that request entirely new documentation out of scope as `wont-fix`. The review skill refines and verifies existing documents; document expansion belongs in a separate authoring task (`write-docs`).
 
 ---
 
@@ -154,41 +166,20 @@ Ask the user how to proceed:
 
 When applying improvements:
 1. Target **only** issues with `pending` status in the state tracker.
-2. For accuracy issues:
-   - Inspect the referenced source code file or specification.
-   - Apply fixes that reflect exact implementation realities.
-3. For style issues:
-   - Strip AI filler words and convert headings to sentence case.
-   - Reformat dense paragraphs into concise tables or bullet lists.
-4. Update the state file, marking addressed issues as `fixed`.
+2. For code accuracy: Inspect referenced source code files and update signatures, types, and imports to match actual reality.
+3. For style and scannability: Reformat paragraphs > 3 sentences into structured tables or concise bullet points; remove duplicate code blocks.
+4. For voice: Strip corporate AI filler words and convert headings to sentence case.
+5. Update the state file, marking addressed issues as `fixed`.
 
 ---
 
 ## Step 5: Verification & Iteration
 
 In subsequent rounds:
-1. **Verify fixes**: Inspect the updated document against the tracker:
+1. **Verify fixes**: Check the updated document against each tracker item:
    - If resolved correctly -> mark `verified-fixed`.
    - If unresolved or incomplete -> mark `not-fixed`.
-2. **Scan for regressions**: Ensure fixes did not introduce syntax errors or broken links.
+2. **Scan for regressions**: Ensure fixes did not break syntax highlighting or introduce unverified code snippets.
 3. **Re-calculate scores**:
-   - If Total >= 32/40 and all critical accuracy issues are `verified-fixed` or `wont-fix`, mark review passed.
+   - If Total >= 32/40 and all critical issues are `verified-fixed` or `wont-fix`, mark review passed.
    - Otherwise, prompt user for next iteration.
-
----
-
-## Document-Specific Audit Checklists
-
-### Business Analysis Docs (BRD / SRS)
-- [ ] Requirements are uniquely identified (`FR-001`, `NFR-001`).
-- [ ] Requirements use RFC 2119 precision (`MUST`, `SHOULD`, `MAY`).
-- [ ] NFRs include measurable metrics (latency in ms, availability percentage), not vague adjectives like "fast" or "secure".
-- [ ] Scenarios include concrete Given/When/Then acceptance criteria.
-- [ ] Scope boundary clearly states what will *not* be built.
-
-### Technical Architecture Docs (HLD / LLD)
-- [ ] Component names and service boundaries match repository packages or microservices.
-- [ ] Data models and column names match database migration files or ORM schemas.
-- [ ] API endpoints, HTTP verbs, and status codes match actual route controllers.
-- [ ] Error handling specifies concrete error codes and fallback mechanisms.
-- [ ] Mermaid diagrams render without syntax errors.

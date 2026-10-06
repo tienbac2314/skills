@@ -1,161 +1,125 @@
 ---
 name: write-docs
-description: Author enterprise-grade documentation across projects, including Business Analysis (BRD, SRS, User Stories/PRD) and Technical Architecture (HLD, LLD, API specs, ADRs, and code guides). Use when creating new documentation, structuring project specifications, or updating technical and business requirements.
+description: Author clean, high-density developer and codebase documentation (Quickstarts, API references, architecture guides, code recipes, engineering deep dives, and ADRs). Use when documenting libraries, SDKs, APIs, developer tools, or application codebases.
 ---
 
-# Write Documentation
+# Write Documentation (Developer & Codebase Docs)
 
-Universal guide for authoring technical engineering and business analysis (BA) documentation across any project.
+Universal guide for authoring developer-facing technical documentation, SDK guides, API references, codebase architecture, and engineering deep-dives. Modeled on high-clarity software engineering principles (tldraw docs guide).
 
-## Scope & Document Classification
+> [!NOTE]
+> **Enterprise BA vs. Developer Docs**:
+> - Use **`write-docs`** (this skill) for software engineers, SDK/library users, open-source contributors, and codebase maintainers (APIs, quickstarts, architecture guides, code recipes, engineering deep-dives).
+> - Use **`enterprise-write-docs`** when authoring formal Business Analysis (BRD, URD, SRS, 12-field Use Case Cards, 5D Business Rules, CSDL data dictionaries, Operations Runbooks, or legal Acceptance Minutes).
 
-Select the appropriate document archetype based on target audience and project stage:
+---
 
-| Category | Document Type | Primary Audience | Core Purpose | Key Artifacts |
-| :--- | :--- | :--- | :--- | :--- |
-| **BA** | **BRD** (Business Requirements) | Executives, Product Owners, Business Stakeholders | Define business problem, ROI, scope, and high-level process flows | Scope matrix (In/Out), Business Process Flows, KPIs |
-| **BA** | **SRS** (Software Requirements) | Business Analysts, Tech Leads, QA Engineers | Detailed functional requirements, system behavior, and constraints | FR/NFR matrices, Use Cases, Gherkin scenarios, Data Dictionary |
-| **BA** | **PRD / User Stories** | Product Managers, Scrum Teams | Feature-level functionality and acceptance criteria | Story format (`As a...`), Acceptance Criteria (`Given/When/Then`) |
-| **Tech** | **HLD** (High-Level Design) | Architects, Engineering Leads, DevOps | System boundaries, architectural topology, component responsibilities | C4 context/container diagrams, integration flows, tech stack choices |
-| **Tech** | **LLD** (Low-Level Design) | Software Engineers, Code Reviewers | Concrete implementation details, class/module structures, DB schemas | Sequence diagrams, class diagrams, ER diagrams, state machines |
-| **Tech** | **API Contract / SDK Docs** | Internal/External Developers, Consumers | Integration specs, payload contracts, authentication, error states | OpenAPI/JSON schemas, endpoint tables, runnable code snippets |
-| **Tech** | **ADR** (Architecture Decision Record) | Engineering Team, Future Maintainers | Record non-trivial architectural decisions, tradeoffs, and rationale | Context, Decision, Consequences, Alternatives |
+## Document Archetypes
+
+Select the appropriate document archetype for developer-facing documentation:
+
+| Document Type | Primary Audience | Core Purpose | Key Structure |
+| :--- | :--- | :--- | :--- |
+| **Quickstart / Getting Started** | New Developers, Evaluators | Fastest path to first successful run | Prerequisites -> Install -> Minimal working code -> Next steps |
+| **Architecture / Codebase Guide** | Contributors, Maintainers | Explain system internals, patterns, and data flow | System overview -> Core abstractions -> Lifecycle/Pipeline -> Invariants |
+| **API & Interface Reference** | Integrating Developers | Definitive contract of functions, types, and endpoints | Signature -> Parameter table -> Return value -> Errors -> Runnable example |
+| **Code Recipe / Example Guide** | Developers implementing features | How to solve specific, real-world development tasks | Problem -> Complete runnable code -> Step-by-step breakdown -> Edge cases |
+| **Engineering Deep-Dive ("Nugget")** | Engineers, Tech Blog Readers | Explain how a hard technical problem was solved | Problem frame -> The insight -> Implementation walkthrough -> Tradeoffs |
+| **Architecture Decision Record (ADR)** | Engineering Team, Maintainers | Document non-trivial technical choices & tradeoffs | Context -> Decision -> Rationale & alternatives -> Consequences |
+| **Migration & Release Guide** | Upgrading Developers | Safe upgrade path between versions | Breaking changes -> Deprecation schedule -> Step-by-step migration |
 
 ---
 
 ## Authoring Blueprints
 
-### 1. Business Requirements Document (BRD)
+### 1. Quickstart & Getting Started Guides
+The goal is zero friction: get the developer from zero to a running snippet in under 3 minutes.
 
-Structure for defining business context and organizational impact:
-
-1. **Executive summary**: Concise problem statement, proposed solution, and strategic alignment.
-2. **Business objectives & KPIs**: Quantifiable targets (e.g., "Reduce checkout drop-off by 15%", "Process 10,000 requests/sec").
-3. **Project scope**:
-   - **In-scope**: Explicit list of deliverables and business capabilities.
-   - **Out-of-scope**: Explicit boundary lines to prevent scope creep.
-4. **Stakeholder & persona analysis**: User personas, operational roles, and business value per persona.
-5. **Business process flows**: Current state (As-Is) vs. Target state (To-Be) using Mermaid `flowchart LR`.
-6. **Business rules**: Unambiguous policy constraints (e.g., "Discount cannot exceed 30% without manager sign-off").
-7. **Risks, assumptions & dependencies**: Business risks, operational dependencies, and mitigation strategies.
-
-### 2. Software Requirements Specification (SRS)
-
-Structure for system-level functional and non-functional specifications:
-
-1. **System overview**: Context diagram showing system interactions with users and third-party systems.
-2. **Functional requirements (FR)**:
-   - Use standard tabular schema:
-     ```markdown
-     | Req ID | Module | Feature | Requirement Description | Priority (P0-P3) | Acceptance Test ID |
-     | :--- | :--- | :--- | :--- | :--- | :--- |
-     | FR-001 | Auth | MFA Login | System must enforce TOTP verification for admin accounts. | P0 | TC-AUTH-01 |
-     ```
-3. **Non-functional requirements (NFR)**:
-   - Quantified metrics across standard pillars:
-     - **Performance**: Latency (p95, p99), throughput (RPS), concurrency limits.
-     - **Scalability**: Horizontal/vertical scaling triggers, data growth projections.
-     - **Security & Compliance**: RBAC, encryption at rest/in transit, regulatory requirements (GDPR, HIPAA, SOC2).
-     - **Availability & Resilience**: SLA/SLO (e.g., 99.95%), RTO (Recovery Time Objective), RPO (Recovery Point Objective).
-4. **External interface requirements**: User interfaces, hardware interfaces, software protocols, communication standards.
-5. **Data models & dictionary**: Entity definitions, data types, validation rules, field constraints.
-6. **Acceptance criteria (Gherkin syntax)**:
-   ```gherkin
-   Scenario: User enters invalid credentials
-     Given an active user exists with email "dev@example.com"
-     When the user submits password "wrongpassword"
-     Then the system returns HTTP 401 Unauthorized
-     And records a failed login attempt in the audit log
+1. **Lead with what this is**: 1 sentence stating what the library/service does.
+2. **Prerequisites**: Exact runtime versions (e.g., `Node >= 20.0`, `Go >= 1.22`, `Python >= 3.11`).
+3. **Installation**: Single copyable CLI command:
+   ```bash
+   npm install @myorg/core
    ```
+4. **Minimal Working Example**: Complete, runnable code snippet with all imports:
+   ```typescript
+   import { createClient } from '@myorg/core'
 
-### 3. High-Level Design (HLD)
+   const client = createClient({ apiKey: process.env.API_KEY })
+   const result = await client.ping()
+   console.log('Connected:', result.ok)
+   ```
+5. **Next Steps**: Table linking to related conceptual guides and API references.
 
-Structure for architectural topology and system decomposition:
+---
 
-1. **System context & architectural topology**:
-   - Mermaid diagram illustrating core services, clients, databases, message brokers, and third-party APIs.
+### 2. Architecture & Codebase Internals Guides
+Explains how the codebase works under the hood so engineers can modify or extend it safely.
+
+1. **High-Level Overview**: Mermaid diagram of component boundaries and data flow:
    ```mermaid
-   graph TD
-     Client[Client Application] --> Gateway[API Gateway / Ingress]
-     Gateway --> AuthService[Auth Service]
-     Gateway --> OrderService[Order Service]
-     OrderService --> DB[(PostgreSQL Main)]
-     OrderService --> EventBus[(Kafka Queue)]
-     EventBus --> WorkerService[Notification Worker]
+   graph LR
+     Input[User Action / Event] --> Dispatcher[Event Dispatcher]
+     Dispatcher --> Reducer[State Store / Reducer]
+     Reducer --> SideEffects[Async Workers]
+     Reducer --> View[Reactive View Layer]
    ```
-2. **Tech stack rationale**: Selected languages, frameworks, databases, and message brokers with technical justifications.
-3. **Component breakdown**: Responsibility boundaries for each service/module.
-4. **Data flow & communication patterns**: Sync (REST, gRPC) vs. Async (event-driven, webhooks, pub/sub).
-5. **Cross-cutting concerns**:
-   - Authentication & authorization (JWT, OAuth2, mTLS).
-   - Observability (distributed tracing, structured metrics, centralized logging).
-   - Caching strategy (TTL, eviction policies, cache invalidation).
-   - Resilience patterns (circuit breakers, exponential backoff, rate limiting).
-6. **Deployment & infrastructure topology**: Cloud provider setup, container orchestration, multi-region/DR layout.
+2. **Core Abstractions**: Short 2-3 sentence definition of each fundamental primitive, class, or domain entity.
+3. **Execution Pipeline**: Numbered step-by-step trace of how a request or event travels through the system.
+4. **Maintenance Invariants**: Explicit rules that developers must NEVER break when refactoring (e.g., "State updates are always synchronous; network requests never mutate state directly").
 
-### 4. Low-Level Design (LLD)
+---
 
-Structure for code-level components, data schemas, and execution details:
+### 3. API & Interface Reference Tables
+Definitive, dense reference for functions, classes, components, or REST/gRPC endpoints.
 
-1. **Component & class models**: Class structures, interfaces, contracts, design patterns used (e.g., Factory, Strategy).
-2. **Sequence diagrams**: Explicit call flows showing actors, services, and failure branches:
-   ```mermaid
-   sequenceDiagram
-     autonumber
-     actor User
-     participant Gateway
-     participant OrderAPI
-     participant PaymentService
-     participant Database
+1. **Method / Function Signature**: Full typed signature.
+2. **Parameters Table**:
+   | Parameter | Type | Required | Default | Description |
+   | :--- | :--- | :---: | :---: | :--- |
+   | `timeoutMs` | `number` | No | `5000` | Connection timeout in milliseconds. |
+   | `retry` | `boolean` | No | `true` | Automatically retry idempotent read failures. |
+3. **Return Value**: Type description and meaning.
+4. **Throws / Errors**: Explicit list of error classes or HTTP error codes with remediation advice.
+5. **Runnable Snippet**: Self-contained example demonstrating canonical usage.
 
-     User->>Gateway: POST /orders
-     Gateway->>OrderAPI: Forward request (validated)
-     OrderAPI->>PaymentService: Process charge
-     alt Payment Success
-       PaymentService-->>OrderAPI: Charge ID: ch_123
-       OrderAPI->>Database: Persist order (status: CONFIRMED)
-       Database-->>OrderAPI: OK
-       OrderAPI-->>User: 201 Created (orderId)
-     else Payment Failure
-       PaymentService-->>OrderAPI: Error: Insufficient funds
-       OrderAPI-->>User: 402 Payment Required
-     end
-   ```
-3. **API endpoint contracts**:
-   - Method, URI, headers, request schema, response schema (success and error codes).
-   - Real, parseable JSON examples (avoid generic `foo`/`bar`).
-4. **Database schema**:
-   - Table definitions, primary/foreign keys, indexes, partitioning strategy, and Mermaid `erDiagram`.
-   - Migration impact and data volume considerations.
-5. **State machine & lifecycle**:
-   - Complete status transitions using Mermaid `stateDiagram-v2`.
-6. **Error handling & edge cases**:
-   - Error code enumeration, transaction isolation levels, concurrency conflicts, idempotency mechanisms.
+---
+
+### 4. Technical Deep-Dives ("Nuggets" / Engineering Blog Posts)
+Short, engaging technical articles explaining how a tricky, non-obvious engineering problem was solved.
+
+#### Structure of a Technical Nugget:
+1. **Frame the problem**: Establish context, tension, and stakes. Why does standard tooling/APIs fall short?
+   > *Example*: "When we added dashed lines, we wanted dashes to line up perfectly on rectangle corners and arrow tips. While this seems obvious, SVG's `stroke-dasharray` does not support this. Here is how we implemented custom dash alignment."
+2. **Show the insight**: Explain the core mathematical, algorithmic, or architectural breakthrough in 1-2 paragraphs ("The insight is...").
+3. **Walk through the implementation**: Clean code snippets building up the solution progressively. Frame as "what we did", not prescriptive tutorials.
+4. **Tradeoffs & Wrap-up**: Performance characteristics, memory footprint, remaining edge cases, and links to source files.
+
+---
 
 ### 5. Architecture Decision Record (ADR)
-
-Structure for documenting key technical choices:
+Document architectural choices in imperative form:
 
 ```markdown
-# ADR-001: [Decision Title in Imperative Form, e.g., Use Kafka for Event Ingestion]
+# ADR-001: [Decision in Imperative Form, e.g., Use SQLite in WAL Mode for Local Cache]
 
 - **Status**: Accepted | Proposed | Deprecated | Superseded by ADR-xxx
 - **Date**: YYYY-MM-DD
 - **Deciders**: [Names / Roles]
 
 ## Context & Problem Statement
-Describe the technical context, requirements, constraints, and forces driving the decision.
+Technical context, requirements, constraints, and forces driving the decision.
 
 ## Decision
-State the chosen architectural solution clearly and assertively.
+Assertive statement of the chosen solution.
 
 ## Rationale & Alternatives Considered
 1. **Option A (Chosen)**: Pros, cons, why selected.
 2. **Option B**: Pros, cons, why rejected.
 
 ## Consequences
-- **Positive**: Direct benefits and unlocked capabilities.
-- **Negative / Tradeoffs**: Operational overhead, added complexity, or technical debt introduced.
+- **Positive**: Capabilities unlocked, performance improvements.
+- **Negative / Tradeoffs**: Operational complexity, limitations, technical debt.
 ```
 
 ---
@@ -163,40 +127,39 @@ State the chosen architectural solution clearly and assertively.
 ## Writing Principles & Quality Standards
 
 ### 1. Progressive Disclosure
-Structure content from high-level understanding to deep technical nuances:
-- **Lead with the core**: 1-2 sentence definition of purpose and outcome.
-- **Standard path**: Canonical, happy-path workflow or basic usage.
-- **Advanced specifics**: Deep architectural details, edge cases, error states, and tuning.
+Move from simple to complex:
+- **First**: Simplest happy-path usage.
+- **Then**: Configuration options and fine-grained control.
+- **Finally**: Deep internals, edge cases, custom adapters, and performance tuning.
 
 ### 2. High-Density Scannability
-- Keep paragraphs short (1 to 3 sentences).
-- Use tables for structured comparisons, API parameters, error codes, and configuration options.
-- Use bullet points for feature lists and prerequisites.
-- Avoid uninterrupted blocks of prose.
+- **1-3 sentences per paragraph**: Dense blocks of text are hard to scan. Cut ruthlessly.
+- **Tables over prose**: Use tables for methods, properties, flags, error codes, and comparisons.
+- **Avoid redundant duplicate sections**: Show complete implementations once. Do not repeat trimmed-down versions of the same code under "Common Use Cases".
 
 ### 3. Clear, Active Technical Voice
-- Use active voice and present tense:
-  - *Yes*: "The gateway inspects incoming JWT tokens and rejects expired sessions."
-  - *No*: "The incoming JWT tokens will be inspected by the gateway and expired sessions will be rejected."
-- Headings must use sentence case (`Data flow and ingestion`, not `Data Flow And Ingestion`).
-- Zero AI tells: eliminate filler words, hollow importance claims, and corporate padding:
-  - Drop: "It is crucial to remember that...", "In today's fast-paced environment...", "Delve into...", "Harness the power of...", "A testament to...".
+- **Active voice & present tense**:
+  - *Yes*: "The serializer converts the state tree into a binary buffer."
+  - *No*: "The state tree will be converted into a binary buffer by the serializer."
+- **Headings in sentence case**: `Event handling and bubbling`, not `Event Handling And Bubbling`.
+- **Zero AI tells**: Eliminate all corporate fluff and formulaic filler:
+  - *Drop*: "It is crucial to note...", "In today's fast-paced environment...", "Delve into...", "Harness the power of...", "A testament to...", "Moreover,...".
 
 ### 4. Concrete Examples & Runnable Code
-- Snippets must be syntactically valid and runnable against the target framework or language.
-- First example must be complete and self-contained; subsequent examples can be focused fragments.
-- Use realistic domain entities and realistic payloads (UUIDs, timestamps, realistic emails, actual column types), never placeholder variables like `foo`, `bar`, `test1`.
+- Every code example must be syntactically valid and runnable against the target framework or language.
+- Include all necessary imports in the primary example.
+- Use realistic variable names and domain payloads (avoid `foo`, `bar`, `test1`).
 
 ---
 
 ## Pre-Publication Verification Checklist
 
-Before publishing or finalizing documentation, verify:
+Before publishing developer documentation, verify:
 
-- [ ] **Audience alignment**: Matches the technical depth of the target reader (business vs. dev).
-- [ ] **Structural completeness**: Contains all mandatory sections for the document archetype.
-- [ ] **Traceability**: Business requirements trace to functional specs, which trace to design artifacts and code symbols.
-- [ ] **Diagram correctness**: Mermaid diagrams render cleanly without syntax errors or unescaped characters.
-- [ ] **Code accuracy**: Code snippets, endpoints, and schemas match actual implementation code.
-- [ ] **Edge cases documented**: Unhappy paths, error states, validation rules, and recovery actions are specified.
-- [ ] **Sentence case & voice**: Headings use sentence case; text is free of AI filler and passive voice.
+- [ ] **First sentence defines purpose**: Immediately answers "what is this and why do I care?"
+- [ ] **Code examples are runnable**: Code snippets have valid syntax, correct imports, and no broken types.
+- [ ] **Progressive disclosure followed**: Basic usage precedes advanced overrides.
+- [ ] **No redundant sections**: Complete examples shown once without repetitive snippets.
+- [ ] **Tables used for structured data**: Parameters, options, and error codes are in tables.
+- [ ] **Sentence case headings**: All headings follow standard sentence case.
+- [ ] **Zero AI fluff**: Free of corporate padding, rhetorical questions, and filler transitions.
