@@ -8,7 +8,7 @@ Compatible with **Antigravity (AGY)**, **Codex**, **Claude Code**, and agentic c
 
 ## Two Distinct Documentation Tracks
 
-The repository provides two specialized, cleanly differentiated documentation tracks:
+The repository provides two specialized, cleanly differentiated documentation tracks plus utility skills:
 
 ```
 ┌────────────────────────────────────────┐   ┌────────────────────────────────────────┐
@@ -34,6 +34,7 @@ The repository provides two specialized, cleanly differentiated documentation tr
 | [`review-docs`](review-docs/SKILL.md) | **Developer & Codebase** | Dual-lens evaluation loop auditing technical accuracy against repository source code and developer usability. | Code alignment (`file:line`), runnable snippets, 1-3 sentence paragraphs, progressive disclosure, zero AI fluff. |
 | [`enterprise-write-docs`](enterprise-write-docs/SKILL.md) | **Enterprise BA & Gov** | Author high-governance specifications for enterprise banking, telecommunications, and mission-critical systems. | 4-in-1 Unified Spec (PTTKHT), 12-field Use Case Cards, 5D Business Rules (BR-xxx), Data Scope RBAC, Field encryption, CSDL tables. |
 | [`enterprise-review-docs`](enterprise-review-docs/SKILL.md) | **Enterprise BA & Gov** | Strict compliance audit enforcing enterprise governance, quantified NFRs, CSDL audit columns, and operational runbook dependency order. | Scorecard out of 40, audit checklists for URD, SRS, HLD, LLD, CSDL, HDVH, and Test Matrices. |
+| [`mermaid-cli`](mermaid-cli/SKILL.md) | **Diagram Compilation** | Generate, compile, or export Mermaid diagrams to SVG, PNG, or PDF static assets, or process markdown blocks via CLI. | [`mmdc`](mermaid-cli/README.md) CLI wrapper, multi-theme raster/vector export, markdown code block replacements. |
 
 ---
 
@@ -62,6 +63,18 @@ Modular markdown blueprints ready for enterprise project execution:
 
 ---
 
+## Utility Skills: Diagram Generation (`mermaid-cli`)
+
+- [`mermaid-cli`](mermaid-cli/SKILL.md): Agent skill for converting Mermaid text diagrams and embedded markdown blocks into SVG, PNG, or PDF images using `mmdc`.
+- **System / Agent Prerequisite**: Requires `@mermaid-js/mermaid-cli` to be installed on your system or run via `npx`.
+  ```bash
+  # Install globally
+  npm install -g @mermaid-js/mermaid-cli
+  ```
+  See [`mermaid-cli/README.md`](mermaid-cli/README.md) for full setup instructions (global install, zero-install `npx`, Linux library dependencies, and Puppeteer container sandbox flags).
+
+---
+
 ## Installation & Usage
 
 ### 1. Antigravity (AGY)
@@ -74,6 +87,9 @@ cp -r review-docs ~/.gemini/config/skills/
 # Enterprise BA & Architecture skills
 cp -r enterprise-write-docs ~/.gemini/config/skills/
 cp -r enterprise-review-docs ~/.gemini/config/skills/
+
+# Diagram compilation utility
+cp -r mermaid-cli ~/.gemini/config/skills/
 ```
 
 ### 2. Activating in Chat
@@ -81,3 +97,4 @@ cp -r enterprise-review-docs ~/.gemini/config/skills/
 - `/review-docs <path>` - Audit developer documentation against repository source code.
 - `/enterprise-write-docs` - Generate enterprise BA specs (BRD/URD/SRS/HLD/CSDL/Runbook/Acceptance).
 - `/enterprise-review-docs <path>` - Audit enterprise specs against governance checklists and quantified NFRs.
+- `mermaid-cli` - Automatically triggered when exporting or rendering diagrams to files.
