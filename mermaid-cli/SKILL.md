@@ -1,116 +1,98 @@
 ---
 name: mermaid-cli
-description: Use when generating, compiling, or exporting Mermaid diagrams to SVG, PNG, or PDF images, or running the mmdc command-line tool.
+description: Use when installing or running mermaid-cli (mmdc) to render, compile, or visually optimize Mermaid diagrams to PNG, SVG, or PDF across Linux, macOS, or Windows with zero bloat.
 ---
 
 # mermaid-cli (mmdc)
 
-## Overview
-CLI tool (`mmdc`) for `@mermaid-js/mermaid-cli`. Converts Mermaid text definitions and markdown-embedded charts into SVG, PNG, and PDF images.
+Standardized skill for compiling, exporting, and visually optimizing Mermaid diagrams using the official `@mermaid-js/mermaid-cli` (`mmdc`). Cross-platform, zero bloat, headless-ready.
+
+---
 
 ## When to Use
-- Convert Mermaid files (`.mmd`, `.mermaid`) to static assets (`.svg`, `.png`, `.pdf`).
-- Extract and render ` ```mermaid ` blocks from Markdown files (`.md`).
-- Generate diagram images programmatically or in build pipelines.
-- Verify Mermaid diagram syntax via CLI render.
+- Compile Mermaid source files (`.mmd`, `.mermaid`) to static assets (`.svg`, `.png`, `.pdf`).
+- Extract and render ` ```mermaid ` code blocks from Markdown files (`.md`).
+- Generate enterprise-grade architecture, sequence, and state machine diagrams.
+- Optimize diagram visual geometry, font scaling, text wrapping, and color semantics.
 
 ### When NOT to Use
-- Antigravity native UI diagram rendering (use inline Mermaid blocks in artifacts or chat instead).
-- Plain Mermaid editing without asset export.
+- Native chat or artifact UI diagram rendering (use inline Mermaid blocks instead).
+- Plain Mermaid syntax editing without image export or verification needs.
 
-## Quick Reference
+---
+
+## 1. Golden Rules
+
+1. **Official CLI Only:** Always use `@mermaid-js/mermaid-cli` (`mmdc`). Never install or use unofficial wrappers like `mermaidx`.
+2. **Zero Bloat:** Do not install heavy desktop apps or extra plugins. Use bundled Puppeteer Chromium or system Chromium.
+3. **Mandatory White Background:** Always pass `-b "#FFFFFF"` unless explicitly asked for transparent assets (`-b transparent`). Default without `-b` causes transparent PNGs with unreadable dark text in Word/dark mode.
+4. **High Resolution Raster:** Always pass `-s 2` (minimum scale 2x) for PNG to prevent blurry renders. For dense diagrams (sequence > 15 steps, wide ERDs), use `-s 5` (crisp 4K assets).
+5. **Vector for Documents:** Export `.svg` alongside `.png` when embedding into Word (DOCX) or print layouts for infinite zoom without pixelation.
+6. **Zero Emojis:** Never use emojis in technical enterprise diagrams.
+7. **Inspect Output:** Never assume render succeeded visually. Always use `view_file` (Multimodal Vision) to inspect output PNG for text overflow, line collisions, and geometry defects.
+
+---
+
+## 2. Quick Reference CLI Commands
 
 | Action | Command |
 |---|---|
-| Single file to SVG | `mmdc -i input.mmd -o output.svg` |
-| Single file to PNG | `mmdc -i input.mmd -o output.png` |
+| Single file to SVG (Vector) | `mmdc -i input.mmd -o output.svg` |
+| Single file to PNG (Standard) | `mmdc -i input.mmd -o output.png -s 2 -b "#FFFFFF"` |
+| High-Density 4K PNG (Dense) | `mmdc -i input.mmd -o output.png -s 5 -b "#FFFFFF"` |
 | Single file to PDF | `mmdc -i input.mmd -o output.pdf` |
-| Stdin input | `echo "graph TD; A-->B;" \| mmdc -i - -o output.svg` |
-| Process Markdown | `mmdc -i docs.md -o docs-rendered.md` |
-| Apply theme | `mmdc -i input.mmd -o output.svg -t dark` |
-| Transparent background | `mmdc -i input.mmd -o output.png -b transparent` |
-| High resolution (scale) | `mmdc -i input.mmd -o output.png -s 2` |
-| Custom CSS | `mmdc -i input.mmd -o output.svg -C custom.css` |
-| Mermaid JSON config | `mmdc -i input.mmd -o output.svg -c mermaid.json` |
-| Puppeteer config | `mmdc -i input.mmd -o output.svg -p puppeteer-config.json` |
+| Stdin input (PowerShell) | `Get-Content input.mmd \| mmdc -i - -o output.png -b "#FFFFFF"` |
+| Process Markdown file | `mmdc -i docs.md -o docs-rendered.md -a ./assets/diagrams` |
+| Puppeteer Sandbox config | `mmdc -i input.mmd -o output.svg -p puppeteer-config.json` |
 
-## Usage Patterns
+---
 
-### 1. Basic File Conversion
-```bash
-# Default output is <input>.svg
-mmdc -i diagram.mmd
+## 3. Visual Verification Loop
 
-# Explicit format and destination
-mmdc -i diagram.mmd -o dist/diagram.png
-mmdc -i diagram.mmd -o dist/diagram.pdf
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│  Write / Edit│ ──> │ Compile mmdc │ ──> │  view_file   │ ──> │ Pass / Refine│
+│     .mmd     │     │  PNG (-s 2)  │     │ Vision Audit │     │   Geometry   │
+└──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
 ```
 
-### 2. Stdin / Pipeline Rendering
-```bash
-# Pipe Mermaid string directly
-cat diagram.mmd | mmdc -i - -o output.svg
+1. **Render PNG:** `mmdc -i input.mmd -o output.png -s 2 -b "#FFFFFF"`.
+2. **Inspect via Vision:** Call `view_file` on `output.png`.
+3. **Check Quality:**
+   - Are participant or note box texts clipped or overflowing boundaries?
+   - Are lifelines or nodes spaced thousands of pixels apart due to long label text?
+   - Are arrows crossing awkwardly or obscuring arrowhead labels?
+   - Do colors follow enterprise semantics (green=success, amber=pending, red=error only, slate/cyan=ops)?
+4. **Iterate:** Apply targeted `<br/>` wraps or layout adjustments and re-verify until pristine.
 
-# In PowerShell
-Get-Content diagram.mmd | mmdc -i - -o output.svg
-```
+---
 
-### 3. Markdown Document Processing
-Processes markdown files, renders all ` ```mermaid ` or `:::mermaid` blocks, replaces code blocks with image links, and saves output images:
-```bash
-# Output modified markdown; images saved to output directory
-mmdc -i README.md -o README.rendered.md
+## 4. Deep-Dive References (Modular Guides)
 
-# Specify custom artifacts folder for generated images
-mmdc -i README.md -o README.rendered.md -a ./assets/diagrams
-```
+For specialized patterns, edge cases, and architectural best practices, consult the dedicated guides in `references/`:
 
-### 4. Themes and Appearance
-Available themes (`-t`):
-`default`, `neutral`, `dark`, `forest`, `base`, `neo`, `neo-dark`, `redux`, `redux-dark`, `redux-color`, `redux-dark-color`, `null`.
-
-```bash
-# Dark theme with transparent background
-mmdc -i diagram.mmd -o diagram.png -t dark -b transparent
-
-# High-DPI raster export
-mmdc -i diagram.mmd -o diagram.png -s 3 --size 2048
-```
-
-### 5. Custom Styling and Configuration
-Mermaid JSON config (`mermaid-config.json`):
-```json
-{
-  "theme": "forest",
-  "flowchart": {
-    "curve": "basis",
-    "htmlLabels": true
-  }
-}
-```
-Run with config:
-```bash
-mmdc -i diagram.mmd -o output.svg -c mermaid-config.json -C custom.css
-```
-
-### 6. Puppeteer Configuration (CI / Container / Sandbox)
-If Chromium fails to launch in sandboxed or container environments, create `puppeteer-config.json`:
-```json
-{
-  "args": ["--no-sandbox", "--disable-setuid-sandbox"]
-}
-```
-Run with:
-```bash
-mmdc -i diagram.mmd -o output.svg -p puppeteer-config.json
-```
-
-## Common Mistakes
-
-| Problem | Cause | Solution |
+| Topic | Reference Document | Key Techniques |
 |---|---|---|
-| `No usable sandbox` error | Puppeteer running in Linux CI/Docker without sandbox permissions | Pass `-p puppeteer-config.json` with `--no-sandbox`. |
-| Huge SVG file size | Font embedding enabled by default | Add `--no-font-embed` flag. |
-| Blurry PNG export | Default scale factor 1 | Add `-s 2` or `-s 3` for Retina/high-res rendering. |
-| Cut-off PDF output | Diagram size mismatch with page format | Use default diagram fitting or pass `--pdf-paper-format A4`. |
-| Missing diagram in Markdown | Syntax error in ` ```mermaid ` block | Verify diagram definition independently before batch rendering. |
+| **Flowchart Anti-Spaghetti** | [flowchart-optimization.md](references/flowchart-optimization.md) | Bus routing (1-to-N trunk bar), strict column locking (`~~~`), anti-ballooning diamonds, footer legend. |
+| **Sequence Diagrams** | [sequence-optimization.md](references/sequence-optimization.md) | Actor `<br/>` wrapping, narrowing huge lifeline gaps (-60% width), multi-actor note spanning. |
+| **Syntax & Escaping** | [syntax-and-escaping.md](references/syntax-and-escaping.md) | Escaping `#` with `#35;` (ticket/URL hashes), quotes `&quot;`, comparisons `&lt;=`, node shapes. |
+| **Enterprise Styling** | [enterprise-styling.md](references/enterprise-styling.md) | Semantic palette hygiene, avoiding red for Ops lanes, component vs sequence boundaries. |
+| **Word & DOCX Export** | [document-export-docx.md](references/document-export-docx.md) | `-b "#FFFFFF"`, high-DPI scaling (`-s 5`), SVG vector pairing, page aspect ratio fitting. |
+| **Troubleshooting & CI** | [troubleshooting-and-ci.md](references/troubleshooting-and-ci.md) | Puppeteer sandbox fixes (`--no-sandbox`), headless Linux fonts, PowerShell paths. |
+
+---
+
+## 5. Common Pitfalls & Quick Solutions
+
+| Issue | Root Cause | Solution |
+|---|---|---|
+| Messy 1-to-N curving splines | Dagre routes each edge independently | Insert a thin dummy `BUS` bar (`height:2px`) between source and targets. |
+| Flowchart 3x taller than needed | Default 50px spacing & giant diamonds | Add `%%{init: {"flowchart": {"rankSpacing": 25, "nodeSpacing": 20}}}%%` & wrap text. |
+| Return loop scrambles column order | Dagre recomputes ranks on feedback cycles | Lock column ranks with `ERR1 ~~~ ERR2 ~~~ ERR3`, or use dotted/label returns. |
+| Missing diagram legend | Subgraph loose nodes stack vertically | Embed HTML table with inline mini SVGs into a single transparent footer node. |
+| Black / unreadable PNG in Word | Transparent background by default | Add `-b "#FFFFFF"` flag. |
+| Fuzzy / blurry text in Word | Scale factor default is 1 (96 DPI) | Use `-s 2` for standard, `-s 5` for dense diagrams. |
+| Parse error on `#ticket` or `#1` | `#` parsed as hex color / reserved token | Replace `#` with `#35;` numeric entity. |
+| Lifelines 1200px+ apart | Long horizontal string on single message line | Insert `<br/>` into message label to split across 2–3 lines. |
+| Note box overflows edge | Note placed over single narrow actor | Add `<br/>` or span note across multiple actors (`Note over A,B:`). |
+| Docker / CI browser launch failure | Linux sandbox restrictions | Pass `-p puppeteer-config.json` with `--no-sandbox`. |
