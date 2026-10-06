@@ -73,12 +73,14 @@ For specialized patterns, edge cases, and architectural best practices, consult 
 
 | Topic | Reference Document | Key Techniques |
 |---|---|---|
+| **Enterprise Archetypes** | [enterprise-diagram-archetypes.md](references/enterprise-diagram-archetypes.md) | 9 clustered enterprise blueprints (Deployment, WBS, RBAC, Decision Spine, Snake Pipeline, State Machine, Dual-Pane, ERD, Sequence), design system tokens, replication templates. |
 | **Flowchart Anti-Spaghetti** | [flowchart-optimization.md](references/flowchart-optimization.md) | Bus routing (1-to-N trunk bar), strict column locking (`~~~`), anti-ballooning diamonds, footer legend. |
 | **Sequence Diagrams** | [sequence-optimization.md](references/sequence-optimization.md) | Actor `<br/>` wrapping, narrowing huge lifeline gaps (-60% width), multi-actor note spanning. |
 | **Syntax & Escaping** | [syntax-and-escaping.md](references/syntax-and-escaping.md) | Escaping `#` with `#35;` (ticket/URL hashes), quotes `&quot;`, comparisons `&lt;=`, node shapes. |
 | **Enterprise Styling** | [enterprise-styling.md](references/enterprise-styling.md) | Semantic palette hygiene, avoiding red for Ops lanes, component vs sequence boundaries. |
 | **Word & DOCX Export** | [document-export-docx.md](references/document-export-docx.md) | `-b "#FFFFFF"`, high-DPI scaling (`-s 5`), SVG vector pairing, page aspect ratio fitting. |
 | **Troubleshooting & CI** | [troubleshooting-and-ci.md](references/troubleshooting-and-ci.md) | Puppeteer sandbox fixes (`--no-sandbox`), headless Linux fonts, PowerShell paths. |
+
 
 ---
 

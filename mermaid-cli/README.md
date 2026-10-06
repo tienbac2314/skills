@@ -115,6 +115,7 @@ cp -r mermaid-cli ~/.gemini/config/skills/
 The agent will then automatically invoke `mmdc` whenever generating, compiling, or exporting diagrams according to the instructions in [`SKILL.md`](SKILL.md).
 
 For advanced layout optimization, visual geometry, and troubleshooting, refer to the guides in [`references/`](references/):
+- [`references/enterprise-diagram-archetypes.md`](references/enterprise-diagram-archetypes.md) (9 clustered enterprise blueprints, design tokens, replication code)
 - [`references/flowchart-optimization.md`](references/flowchart-optimization.md) (Bus routing, column locking `~~~`, anti-ballooning)
 - [`references/sequence-optimization.md`](references/sequence-optimization.md) (Actor wrapping, lifeline gap reduction)
 - [`references/syntax-and-escaping.md`](references/syntax-and-escaping.md) (Escaping `#35;`, quotes, comparison entities)
