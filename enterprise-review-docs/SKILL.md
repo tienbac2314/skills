@@ -3,13 +3,13 @@ name: enterprise-review-docs
 description: Review, audit, and improve code and BA documentation (BRD, URD, SRS, HLD, LLD, API specs, CSDL data dictionaries, Operations Runbooks, and Test Matrices) against enterprise standards for technical accuracy, business logic completeness, clarity, and voice. Iterates with tracking and verification.
 ---
 
-# Review Documentation
+# Enterprise Review Documentation
 
-Universal evaluation and iterative refinement workflow for code documentation, architectural specs, and Business Analysis (BA) artifacts across any project, enforcing empirical enterprise banking and telecom standards (MobiFone, LPBank).
+Universal evaluation and iterative refinement workflow for code documentation, architectural specs, and Business Analysis (BA) artifacts across any project, enforcing empirical tier-1 enterprise banking, telecom, and mission-critical standards.
 
 **Target**: Target document path (`$ARGUMENTS` or specified file)
 
-**Companion skill**: `write-docs`
+**Companion skill**: `enterprise-write-docs`
 
 ---
 
@@ -26,9 +26,11 @@ Universal evaluation and iterative refinement workflow for code documentation, a
 │  │ Lens A: Style & Voice   │   │ Lens B: Content & Rigor  │  │
 │  │ - 1-3 sentence paras    │   │ - Governance & Sign-off  │  │
 │  │ - Sentence case         │   │ - 12-field Use Case Card │  │
-│  │ - Zero AI fluff/tells   │   │ - API tables & Error JSON│  │
-│  │                         │   │ - CSDL audit columns     │  │
-│  │                         │   │ - Runbook sequences      │  │
+│  │ - Zero AI fluff/tells   │   │ - 5D Business Rules (BR) │  │
+│  │ - Active voice          │   │ - Data Scope RBAC (2-tier)│ │
+│  │                         │   │ - Field Crypto & Blind Idx│ │
+│  │                         │   │ - DB Table Classification│  │
+│  │                         │   │ - Multi-browser & Rounds │  │
 │  └─────────────────────────┘   └──────────────────────────┘  │
 └──────────────────────────────────────────────────────────────┘
                                ↓
@@ -82,9 +84,10 @@ Status values: `pending` | `fixed` | `verified-fixed` | `not-fixed` | `wont-fix`
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | ISS-001 | Governance | Header | Missing Document Control table, revision history, or sign-off page | Enterprise Standards | pending |
 | ISS-002 | Accuracy | Section 3.2 | API specifies endpoint `POST /orders`, but route in code is `POST /api/v1/orders` | `src/routes/order.ts:24` | pending |
-| ISS-003 | Completeness | Section 4.1 | Use case `UC-TASK-01` lacks Exception Flow (EF) and explicit Trigger | 12-Field UC Standard | pending |
-| ISS-004 | Enterprise DB| Section 5.0 | Table `ew_order` missing mandatory audit column `tenant_code` or `version` | CSDL Standard | pending |
-| ISS-005 | Voice | Section 1 | Contains AI fluff: "In today's fast-paced environment, it is crucial..." | Writing Guidelines | pending |
+| ISS-003 | Completeness | Section 4.1 | Use case lacks Exception Flow (EF) or Business Rules reference | 12-Field UC Standard | pending |
+| ISS-004 | Security | Section 5.0 | PII stored in plaintext without AES-256 encryption and Blind Index | Security Standards | pending |
+| ISS-005 | Enterprise DB| Section 6.2 | Tables not classified into Custom / Extended / Baseline / Eliminated | CSDL Standard | pending |
+| ISS-006 | Voice | Section 1 | Contains AI fluff: "In today's fast-paced environment, it is crucial..." | Writing Guidelines | pending |
 ```
 
 ---
@@ -106,32 +109,38 @@ Status values: `pending` | `fixed` | `verified-fixed` | `not-fixed` | `wont-fix`
 ### Lens B: Content, Technical & Business Rigor
 
 1. **Document Governance (Prerequisite)**:
-   - Does it have a Document Control block (Project Name, Doc Code, Version, Issue Date)?
-   - Does it contain a Revision History table (Date, Old Version, New Version, Description, Author)?
-   - Does it contain a Sign-off table (Trang ký: Author, Reviewer, Approver)?
+   - Document Control block (Project Name, Doc Code, Version, Issue Date).
+   - Revision History table (Date, Old Version, New Version, Description, Author).
+   - Sign-off table (Trang ký: Author, Reviewer, Approver).
 2. **Completeness & Coverage (0-10)**:
-   - **URD / SRS**:
-     - Are functional requirements specified using the **12-Field Use Case Card** (Actor, Priority, Trigger, Pre-conditions, Post-conditions, Basic Flow, Alternative Flow, Exception Flow, Business Rules, Acceptance Criteria, Related Design)?
-     - Are In-Scope and Out-of-Scope boundaries explicitly defined?
-     - Are NFRs quantified (Latency in ms, Availability %, Concurrency CCU, SLA/SLO)?
+   - **URD / SRS & Unified Spec (PTTKHT)**:
+     - Functional requirements specified using **12-Field Use Case Card** (Actor, Priority, Trigger, Pre/Post-conditions, Basic/Alt/Exception flows, Business Rules, Acceptance Criteria, Related Design).
+     - **Business Rules Catalog (BR-xxx)** categorized into 5 dimensions: Scope & Permissions (`BR-SCP`), Workflow & Roles (`BR-WF`), Calculations & Rollups (`BR-CALC`), Data Protection & Audit (`BR-SEC`), Data Integrity & Constraints (`BR-INT`).
+     - In-Scope and Out-of-Scope boundaries explicitly defined.
+     - Quantified NFRs (`NFR-SEC`, `NFR-PERF`, `NFR-REL`, `NFR-MNT`, `NFR-UX`, `NFR-CMP`).
    - **HLD (High-Level Design)**:
-     - Are system tiers cleanly delineated (Ingress/Gateway, Business Services, Cache/Broker, DB)?
-     - Is the clustering topology specified (Active-Active Gateway/App, Active-Standby DB)?
-     - Are Server KPIs and Service KPIs quantified in tables?
+     - Clear tier delineation (Client, Ingress/Gateway, Microservices, Cache/Broker, DB).
+     - **Data Scope RBAC Model**: 4 account scopes (Global, Managing Unit, Subordinate Unit, Base User) $\times$ 2 layers of control (UI Route Guard + API/SQL Query Scope Filter).
+     - **Request Journey & Maintenance Invariants**: 7-Step E2E journey + 4 Maintenance Invariants (no scope bypass, no plaintext PII logging, state validation before transition, transactional audit).
+     - Clustering & High Availability (Active-Active Gateway/App, Active-Standby DB).
+     - Quantified Server KPIs and Service KPIs.
    - **LLD & API Specifications**:
-     - Do API contracts follow tabular schemas (Request Headers, Query/Body Params, Response Headers, Response Body fields)?
-     - Are parameters marked with Mandatory/Optional (`M`/`O`) and validation rules?
-     - Are concrete cURL snippets and complete JSON payloads (Success 200/201 and Error 400/401/403/500 with error codes) provided?
+     - Tabular schema: Request Headers, Query/Body Params, Response Headers, Response Body fields.
+     - Mandatory/Optional (`M`/`O`) flags and explicit validation rules.
+     - Concrete cURL snippets and complete JSON payloads (Success 200/201 and Error 400/401/403/500 with error codes).
    - **CSDL (Database Design)**:
-     - Does each table specify: Column Name, Data Type, Size, Nullable, PK/FK, Default, Business Meaning?
-     - Are mandatory enterprise audit columns present (`tenant_code`, `is_deleted`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `version`)?
-     - Is indexing and partitioning documented for high-volume entities?
+     - **Table Classification (4 Groups)**: Custom system tables, Extended platform tables, Unmodified baseline tables, Eliminated tables.
+     - **Field-Level Sensitive Data Encryption**: PII plaintext columns null/removed, AES-256-GCM cipher columns, HMAC-SHA256 blind index hash columns, key versioning, operational trade-offs documented.
+     - Mandatory audit columns (`tenant_code`, `is_deleted`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `version`).
+     - Capacity growth estimation and re-architecture warning thresholds.
    - **Operations Runbook (HDVH)**:
-     - Is startup/shutdown sequenced according to strict dependency order?
-     - Does the troubleshooting matrix map: `Symptom -> Root Cause -> Workaround -> Permanent Fix`?
-   - **Test Matrix (RTM)**:
-     - Does RTM link requirements to test cases?
-     - Do test cases specify Pre-conditions, Steps to reproduce, Test data, Expected results, and Priority?
+     - Startup/shutdown procedures adhere to strict dependency order.
+     - Troubleshooting matrix maps: `Symptom -> Root Cause -> Workaround -> Permanent Fix`.
+   - **Acceptance Testing & Sign-off (KBKT & BBKT)**:
+     - Multi-browser matrix (EDG, CHR, FF) and 3 execution rounds (L1/L2/L3).
+     - 7 testing levels with negative testcases for scope boundaries.
+     - Non-negotiable mandatory passing invariants specified.
+     - Formal legal acceptance minutes template with committee roles and pilot operational evaluation.
 3. **Accuracy & Real-World Alignment (0-10)**:
    - **Code alignment**: When repository code is present, verify function names, API endpoints, schema types, and file paths against actual source lines (`file:line`). Flag discrepancies.
    - **Business logic soundness**: Check that calculation formulas, status transitions, and validation rules have no logical deadlocks.
@@ -150,7 +159,7 @@ Compile the evaluation findings into a structured scorecard:
 | :--- | :---: | :--- |
 | **Readability & Voice** | X/10 | [Scannability, sentence case, zero AI tells] |
 | **Governance & Structure** | X/10 | [Document control, sign-off, mandatory sections] |
-| **Content Completeness** | X/10 | [12-field UC cards, NFRs, API tables, audit columns] |
+| **Content Completeness** | X/10 | [12-field UC, BR-xxx 5D, Data Scope RBAC, Crypto, DB classification] |
 | **Technical Accuracy** | X/10 | [Code/schema consistency, diagram correctness] |
 | **Total** | **X/40** | Passing threshold: 32/40 (Zero P0 accuracy defects) |
 
@@ -177,7 +186,7 @@ Ask the user how to proceed:
 When applying improvements:
 1. Target **only** issues with `pending` status in the state tracker.
 2. For accuracy issues: Inspect referenced source code or specs and match exact implementation realities.
-3. For enterprise completeness: Inject missing tables (governance header, 12-field use case cards, API parameter tables, CSDL audit columns).
+3. For enterprise completeness: Inject missing tables (governance header, 12-field use case cards, BR-xxx rules, Data Scope matrix, API parameter tables, CSDL classification, field encryption).
 4. For style issues: Strip AI filler words, enforce sentence case headings, and break down paragraphs > 3 sentences into tables or bullets.
 5. Update state tracker, marking addressed issues as `fixed`.
 
@@ -198,16 +207,19 @@ In subsequent rounds:
 
 ## Document-Specific Audit Checklists
 
-### 1. Business Analysis Docs (URD / SRS)
+### 1. Business Analysis Docs (URD / SRS / PTTKHT)
 - [ ] Document control, version history, and sign-off table present.
 - [ ] Requirements uniquely identified (`FR-001`, `NFR-001`).
 - [ ] Each functional requirement detailed via 12-field Use Case Card (with Trigger, Pre/Post-conditions, Basic/Alt/Exception flows, Business Rules, Acceptance Criteria).
+- [ ] Business Rules Catalog (`BR-xxx`) cataloged across 5 dimensions: Scope, Workflow, Calculations, Security, Integrity.
 - [ ] Acceptance criteria written with testable precision (Gherkin `Given/When/Then`).
 - [ ] Quantified NFRs (latency, CCU, availability %, security compliance).
 - [ ] Scope boundary clearly states what will *not* be built.
 
 ### 2. Technical Architecture Docs (HLD / LLD)
 - [ ] System topology delineated into Client, Ingress/Gateway, Microservices, Broker/Cache, and Persistence tiers.
+- [ ] Data Scope RBAC Model defines 4 account scopes $\times$ 2 enforcement layers (UI + API data scope filter).
+- [ ] 7-Step Request Journey & 4 Maintenance Invariants explicitly documented.
 - [ ] High-availability clustering defined (Active-Active Gateway/App, Active-Standby DB).
 - [ ] Quantified Server KPIs (CPU, RAM, Disk %) and Service KPIs (latency, query success rate).
 - [ ] API endpoints specified in tabular format with parameter types, mandatory flags, and validation rules.
@@ -216,13 +228,18 @@ In subsequent rounds:
 
 ### 3. Database Design (PTTK CSDL)
 - [ ] Mermaid ER diagram represents entities and relations.
-- [ ] Table summary maps physical names to business descriptions.
+- [ ] Table classification partitioned into: Custom system tables, Extended platform tables, Unmodified baseline tables, and Eliminated tables.
+- [ ] Field-level encryption documented for sensitive PII (AES-256-GCM cipher, HMAC-SHA256 blind index, key version, operational search trade-offs).
 - [ ] Every table specifies: Data Type, Size, Nullable, PK/FK, Default Value, Description.
 - [ ] Mandatory enterprise audit columns present (`tenant_code`, `is_deleted`, `created_by`, `created_date`, `last_modified_by`, `last_modified_date`, `version`).
 - [ ] Indexing strategy defined for high-frequency queries.
+- [ ] Capacity growth sizing formula and re-architecture thresholds specified.
 
-### 4. Operations Runbook & Test Matrix (HDVH & Testcase)
+### 4. Operations Runbook & Acceptance Testing (HDVH & KBKT / BBKT)
 - [ ] Startup/shutdown procedures adhere to strict dependency order.
 - [ ] Troubleshooting matrix maps `Symptom -> Root Cause -> Workaround -> Permanent Fix`.
 - [ ] Requirements Traceability Matrix (RTM) maps requirements to test cases.
-- [ ] Test cases specify Pre-conditions, Steps, Test Data, Expected Results, and Priority.
+- [ ] Multi-browser matrix (EDG, CHR, FF) and 3 execution rounds (L1, L2, L3) tracked.
+- [ ] 7 testing levels covered, including negative authorization/scope bypass testcases.
+- [ ] Non-negotiable mandatory passing invariants specified.
+- [ ] Formal Acceptance & Pilot Operations Minutes template included for sign-off.

@@ -102,6 +102,20 @@ graph TD
 - **Tầng tích hợp & bất đồng bộ (Integration Tier)**: Hàng đợi thông điệp phục vụ tác vụ nền, đồng bộ dữ liệu phi tập trung và gửi thông báo.
 - **Tầng dữ liệu (Persistence Tier)**: CSDL quan hệ chính có cấu hình Replicas, kết hợp Redis caching giảm tải truy vấn đọc.
 
+### 2.3 Mô hình Phân quyền theo Phạm vi Dữ liệu (Data Scope RBAC Model)
+
+Hệ thống triển khai kiểm soát dữ liệu đa phân cấp theo ma trận 4 phạm vi $\times$ 2 lớp kiểm soát:
+
+#### Bốn phạm vi tài khoản (Account Scopes)
+1. **Phạm vi 1 - Toàn hệ thống (Global / Headquarters)**: Truy cập, cấu hình và tổng hợp số liệu của toàn bộ các đơn vị trong tổ chức.
+2. **Phạm vi 2 - Cấp đơn vị quản lý (Managing Division / Unit)**: Quản lý nghiệp vụ nội bộ và xem, phê duyệt, tổng hợp số liệu từ toàn bộ các đơn vị trực thuộc cấp dưới.
+3. **Phạm vi 3 - Cấp đơn vị trực thuộc (Subordinate Unit / Branch)**: Chỉ xem, khởi tạo và quản lý dữ liệu thuộc phạm vi đơn vị của chính mình.
+4. **Phạm vi 4 - Người dùng cơ sở / Cá nhân (Base User / Self)**: Chỉ xem dữ liệu cá nhân của chính mình hoặc dữ liệu công khai chung.
+
+#### Hai lớp kiểm soát độc lập (Enforcement Layers)
+- **Lớp 1 - Route & Action Guard (UI Tier)**: Ẩn/hiện menu, nút bấm thao tác và chặn điều hướng trực tiếp trên Frontend dựa trên vai trò và phạm vi gán cho phiên người dùng.
+- **Lớp 2 - Service & Data Scope Filter (API Tier - Bắt buộc)**: Tầng Business Service và Data Access Layer tự động inject điều kiện lọc `unit_id IN (...)` vào mọi câu lệnh truy vấn SQL. **Tuyệt đối cấm tin tưởng tham số `unit_id` do client truyền lên**; tham số phạm vi phải được phân giải trực tiếp từ JWT/Identity context của phiên đăng nhập.
+
 ---
 
 ## III. Cấu hình và Môi trường triển khai (Infrastructure & Deployment)
@@ -180,6 +194,23 @@ sequenceDiagram
   Broker->>Noti: Tiêu thụ sự kiện RecordCreatedEvent
   Noti->>User: Gửi email / push thông báo cho cấp phê duyệt
 ```
+
+### 4.3 Đường đi của một yêu cầu & Bốn điểm cần giữ khi bảo trì (Request Journey & Maintenance Invariants)
+
+#### Bảy bước xử lý của một yêu cầu (7-Step Journey)
+1. **Bước 1 - Dispatch UI**: Người dùng gửi yêu cầu từ Web Portal; Client đính kèm JWT Token vào Header `Authorization`.
+2. **Bước 2 - Reverse Proxy & Gateway**: API Gateway kiểm tra TLS, rate limit, giải mã chữ ký JWT và gắn headers nhận dạng nội bộ (`X-User-Id`, `X-Tenant-Code`, `X-Unit-Id`).
+3. **Bước 3 - Routing Controller**: Controller tầng ứng dụng nhận DTO, thực thi schema validation (ràng buộc dữ liệu đầu vào).
+4. **Bước 4 - Scope & Permission Guard**: Interceptor đối chiếu quyền hạn thao tác và phân giải phạm vi dữ liệu được phép xử lý.
+5. **Bước 5 - Domain Service Execution**: Thực thi business rules, tính toán nghiệp vụ, kiểm tra trạng thái hợp lệ và máy trạng thái (State Machine).
+6. **Bước 6 - Data Persistence & ORM**: Thực thi câu lệnh SQL có gán bắt buộc điều kiện tenant/unit scope; mã hóa trường nhạy cảm trước khi lưu.
+7. **Bước 7 - Audit Log & Event Publishing**: Ghi nhận bản ghi `SecurityAuditLog` đồng thời bắn sự kiện vào Message Broker để xử lý các tác vụ nền.
+
+#### Bốn điểm bất biến cần giữ khi bảo trì (4 Maintenance Invariants)
+1. **Bất biến 1 - Không bypass Data Scope tại Repository**: Mọi hàm truy vấn danh sách hoặc chi tiết bản ghi bắt buộc nhận `tenant_code` và `unit_scope` làm điều kiện `WHERE`. Cấm tuyệt đối viết câu lệnh chỉ lọc theo `id` đơn thuần.
+2. **Bất biến 2 - Tuyệt đối không log Plaintext dữ liệu nhạy cảm**: Log hệ thống (Kibana/Console/File) tuyệt đối không in số định danh cá nhân, mật khẩu, access token hoặc chuỗi byte giải mã.
+3. **Bất biến 3 - Chuyển trạng thái phải kiểm tra trạng thái nguồn**: Mọi lệnh cập nhật trạng thái (State Transition) phải xác nhận trạng thái hiện tại trong CSDL khớp với luồng hợp lệ trước khi chuyển trạng thái mới (chống race condition và thao tác trái luồng).
+4. **Bất biến 4 - Kiểm toán gắn liền giao dịch (Transactional Audit)**: Mọi thao tác thay đổi dữ liệu trọng yếu phải ghi vết kiểm toán thành công hoặc rollback toàn bộ giao dịch nếu ghi log thất bại.
 
 ---
 

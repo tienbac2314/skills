@@ -77,7 +77,7 @@ stateDiagram-v2
 
 ## II. Đặc tả Hợp đồng API Chuẩn Doanh nghiệp (Enterprise API Specification)
 
-*Định dạng bảng đặc tả chuẩn ngân hàng (Mẫu LPBank / Viễn thông)*
+*Định dạng bảng đặc tả chuẩn doanh nghiệp, ngân hàng và viễn thông*
 
 ### API 01: [Tên API ngắn gọn, ví dụ: Lấy Token xác thực]
 

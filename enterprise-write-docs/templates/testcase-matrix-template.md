@@ -1,4 +1,5 @@
-# [TÊN DỰ ÁN] - MA TRẬN & KỊCH BẢN KIỂM THỬ HỆ THỐNG (TEST TRACEABILITY MATRIX & TEST CASES)
+# [TÊN DỰ ÁN] - MA TRẬN & KỊCH BẢN KIỂM THỬ HỆ THỐNG
+*(TEST TRACEABILITY MATRIX, MULTI-BROWSER TEST SUITES & EXECUTION RUNS)*
 
 ## 0. Quản lý tài liệu (Document Control)
 
@@ -6,46 +7,95 @@
 | :--- | :--- |
 | **Tên dự án** | [Tên dự án phần mềm] |
 | **Mã hiệu dự án** | [MÃ-DỰ-ÁN] |
-| **Mã hiệu tài liệu** | [MÃ-DỰ-ÁN-TESTPLAN] |
+| **Mã hiệu tài liệu** | [MÃ-DỰ-ÁN-KBKT] |
 | **Phiên bản** | 1.0 |
 | **Ngày lập** | YYYY-MM-DD |
 
 ---
 
-## I. Ma trận Truy vết Yêu cầu Kiểm thử (Requirements Traceability Matrix - RTM)
+## I. Môi trường và Phương pháp Kiểm thử
 
-*Bảng liên kết từ mã yêu cầu URD/SRS sang kịch bản kiểm thử:*
+### 1.1 Ma trận Trình duyệt Hỗ trợ (Browser Compatibility Matrix)
+Mọi ca kiểm thử tối thiểu được thực thi trên 01 trình duyệt; nhóm giao diện, tương thích và tính năng cốt lõi bắt buộc kiểm chứng trên toàn bộ 03 trình duyệt:
 
-| STT | Phân hệ (Module) | Mã yêu cầu (URD / SRS) | Tên tính năng kiểm thử | Loại kiểm thử | Mức ưu tiên | Tổng số Test Cases |
-| :---: | :--- | :--- | :--- | :--- | :---: | :---: |
-| 1 | Xác thực (Auth) | FR-AUTH-01 | Đăng nhập tài khoản & Kiểm tra phân quyền | Functional / Security | P0 | 12 |
-| 2 | Thành viên (User) | FR-USER-01 | Đồng bộ danh sách người dùng từ Base Platform | Integration | P0 | 8 |
-| 3 | Đơn vị (Dept) | FR-DEPT-03 | Import danh sách quản lý đơn vị bằng Excel | Functional / Boundary | P1 | 15 |
-| 4 | Công việc (Task) | FR-TASK-02 | Tạo mới và giao việc cho nhân viên | Functional / E2E | P0 | 20 |
-| 5 | Báo cáo (Report) | FR-REP-01 | Xuất báo cáo tiến độ công việc theo đơn vị | Performance / Functional | P2 | 6 |
+| STT | Trình duyệt | Phiên bản tối thiểu | Ký hiệu | Phạm vi áp dụng |
+| :---: | :--- | :--- | :---: | :--- |
+| 1 | Microsoft Edge | 120+ | **EDG** | Mọi nhóm kiểm thử (Mặc định) |
+| 2 | Google Chrome | 120+ | **CHR** | Mọi nhóm kiểm thử (Mặc định) |
+| 3 | Mozilla Firefox | 115+ | **FF** | Kiểm thử tương thích và phi chức năng |
 
----
-
-## II. Bảng Kịch bản Kiểm thử Chi tiết (Detailed Test Case Execution Table)
-
-### Phân hệ: [Tên Phân hệ / Module, ví dụ: Quản lý Công việc]
-
-| Mã Test Case | Mã Yêu cầu | Tên kịch bản kiểm thử | Tiền điều kiện | Các bước thực hiện (Steps to Reproduce) | Dữ liệu kiểm thử (Test Data) | Kết quả mong muốn (Expected Results) | Mức ưu tiên | Lần test 1 | Lần test 2 | Mã lỗi (Defect ID) | Ghi chú |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :---: | :---: | :---: | :--- | :--- |
-| **TC-TASK-001** | FR-TASK-02 | Kiểm tra tạo công việc hợp lệ | Người dùng đăng nhập quyền QLĐV | 1. Vào menu "Việc của tôi"<br>2. Nhấn nút "Tạo mới"<br>3. Điền tiêu đề, người thực hiện, hạn chót<br>4. Nhấn nút "Lưu" | Tiêu đề: "Soạn thảo HLD"<br>Assignee: `user_dev01`<br>Hạn chót: `CURRENT_DATE + 3` | Hệ thống lưu thành công, thông báo "Tạo công việc thành công", công việc hiển thị trên tab "Đã giao" | **P0** | **Passed** | - | - | Happy path |
-| **TC-TASK-002** | FR-TASK-02 | Kiểm tra chặn tạo việc khi thiếu tiêu đề | Người dùng đăng nhập quyền QLĐV | 1. Vào menu "Tạo mới công việc"<br>2. Để trống trường tiêu đề<br>3. Điền các trường khác hợp lệ<br>4. Nhấn "Lưu" | Tiêu đề: `""` (Empty string)<br>Assignee: `user_dev01` | Hệ thống chặn submit, highlight ô tiêu đề màu đỏ, thông báo lỗi: "Tiêu đề không được để trống" | **P0** | **Passed** | - | - | Validation check |
-| **TC-TASK-003** | FR-TASK-02 | Kiểm tra nhập hạn chót trong quá khứ | Người dùng đăng nhập quyền QLĐV | 1. Vào menu "Tạo mới"<br>2. Nhập tiêu đề hợp lệ<br>3. Chọn hạn chót là ngày hôm qua<br>4. Nhấn "Lưu" | Hạn chót: `CURRENT_DATE - 1` | Hệ thống báo lỗi: "Hạn chót hoàn thành không được nhỏ hơn ngày hiện tại" | **P1** | **Failed** | **Passed** | DEF-089 | Đã fix tại build v1.0.2 |
-| **TC-TASK-004** | FR-DEPT-03 | Import file Excel chứa bản ghi lỗi | Người dùng quyền Admin | 1. Chọn menu "Import QLĐV"<br>2. Upload file có 10 dòng (8 dòng hợp lệ, 2 dòng sai mã nhân viên)<br>3. Nhấn "Tiến hành Import" | File: `import_dept_err.xlsx` | Hệ thống import thành công 8 dòng, cảnh báo lỗi 2 dòng và cho phép tải file log chứa chi tiết 2 dòng lỗi | **P1** | **Passed** | - | - | Partial import test |
-| **TC-TASK-005** | FR-AUTH-01 | Kiểm tra đăng nhập với mật khẩu sai quá 5 lần | Tài khoản đang ở trạng thái ACTIVE | 1. Truy cập trang đăng nhập<br>2. Nhập username đúng<br>3. Nhập mật khẩu sai liên tiếp 5 lần | Username: `admin_system`<br>Password: `wrong_pass` | Hệ thống khóa tạm thời tài khoản trong 15 phút, hiển thị thông báo "Tài khoản bị khóa tạm thời do nhập sai quá số lần quy định" | **P0** | **Passed** | - | - | Security lockout test |
+### 1.2 Các Cấp độ và Loại hình Kiểm thử (Testing Levels)
+1. **Kiểm thử Chức năng (Functional Testing)**: Từng use case theo phân hệ (`TC-AUTH`, `TC-CORE`, `TC-REP`).
+2. **Kiểm thử Phân quyền & Phạm vi Dữ liệu (Role & Data Scope RBAC)**: Ma trận Vai trò $\times$ Phạm vi dữ liệu (`TC-RBAC`), bao gồm bắt buộc các ca kiểm thử tiêu cực (cố tình đổi ID đơn vị trên URL/API để kiểm chứng hệ thống chặn).
+3. **Kiểm thử Luồng xuyên suốt (E2E Workflow)**: Luồng duyệt nhiều cấp, chuyển trạng thái vòng đời thực thể (`TC-WF`).
+4. **Kiểm thử An toàn thông tin & Mật mã (Security & Cryptography)**: Xác nhận dữ liệu nhạy cảm được mã hóa trong DB, blind index tìm kiếm, chặn SQLi/XSS (`TC-SEC`).
+5. **Kiểm thử Phi chức năng & Tương thích (NFR & Compatibility)**: Tốc độ phản hồi, giao diện thích ứng, tương thích trình duyệt (`TC-PERF`).
+6. **Nghiệm thu Cài đặt sau Triển khai (Post-Installation Acceptance)**: Kiểm chứng biến môi trường, kết nối DB, giải mã dữ liệu sau cài đặt (`TC-CD`).
+7. **Vận hành Thử nghiệm (Pilot Operations)**: Chu kỳ nghiệp vụ thực tế với nhân sự và số liệu thật (`VHT`).
 
 ---
 
-## III. Thống kê Kết quả Kiểm thử (Test Execution Summary)
+## II. Ma trận Truy vết Yêu cầu (Requirements Traceability Matrix - RTM)
 
-| Trạng thái | Số lượng (Test Cases) | Tỷ lệ (%) | Đánh giá nghiệm thu |
+| STT | Phân hệ (Module) | Mã yêu cầu (SRS) | Nhóm kiểm thử | Loại kiểm thử | Mức ưu tiên | Số ca (TCs) | Trạng thái |
+| :---: | :--- | :--- | :---: | :--- | :---: | :---: | :---: |
+| 1 | Xác thực & Phiên | FR-AUTH-01..03 | TC-AUTH | Functional / Security | P0 | 12 | Đạt |
+| 2 | Phân quyền Phạm vi | FR-RBAC-01..05 | TC-RBAC | Role & Scope / Negative | P0 | 12 | Đạt |
+| 3 | Nghiệp vụ Cốt lõi | FR-CORE-01..10 | TC-CORE | Functional / Business | P0 | 24 | Đạt |
+| 4 | Luồng duyệt & Trạng thái | FR-WF-01..06 | TC-WF | E2E Workflow | P0 | 18 | Đạt |
+| 5 | Báo cáo & Tổng hợp | FR-REP-01..08 | TC-REP | Calculations / Formulas | P1 | 22 | Đạt |
+| 6 | An toàn & Mật mã | NFR-SEC-01..12 | TC-SEC | Security / Crypto | P0 | 12 | Đạt |
+| 7 | Cài đặt & Triển khai | NFR-OPS-01..04 | TC-CD | Deployment Verification | P0 | 12 | Đạt |
+
+---
+
+## III. Bảng Kịch bản Kiểm thử Chi tiết (Detailed Test Case Execution Table)
+
+*Quy ước kết quả: **P** (Passed / Đạt), **F** (Failed / Không đạt), **PE** (Pending / Đang xem xét), **N** (Not Run / Chưa chạy)*
+
+| Mã TC | Mã SRS | Tên kịch bản kiểm thử | Tiền điều kiện | Các bước thực hiện (Steps to Reproduce) | Dữ liệu kiểm thử (Test Data) | Kết quả mong muốn (Expected Results) | Ưu tiên | Trình duyệt (EDG/CHR/FF) | Lần 1 (L1) | Lần 2 (L2) | Lần 3 (L3) | Defect ID |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
+| **TC-AUTH-01** | FR-AUTH-01 | Đăng nhập tài khoản hợp lệ | Tài khoản trạng thái ACTIVE | 1. Mở trang đăng nhập<br>2. Điền username/password<br>3. Nhấn nút Đăng nhập | Username: `user_core`<br>Pass: `Valid@2026` | Đăng nhập thành công, chuyển hướng vào Dashboard theo quyền | **P0** | EDG, CHR | **P** | - | - | - |
+| **TC-RBAC-03** | FR-RBAC-04 | **[Tiêu cực]** Chặn truy cập dữ liệu đơn vị khác qua API | Đăng nhập tài khoản cấp Đơn vị B | 1. Dùng cURL/Postman gọi API chi tiết hồ sơ<br>2. Truyền `unit_id` của Đơn vị A (khác đơn vị) | Token: Cấp đơn vị B<br>Param: `unit_id=UNIT_A` | Hệ thống trả HTTP 403 Forbidden, không trả bất kỳ dữ liệu nào, ghi log cảnh báo an ninh | **P0** | CHR | **P** | - | - | - |
+| **TC-CORE-02** | FR-CORE-02 | Tạo bản ghi với trường bắt buộc bị bỏ trống | Đăng nhập tài khoản nhân viên | 1. Nhấn nút "Tạo mới"<br>2. Bỏ trống tiêu đề<br>3. Nhấn "Lưu" | Title: `""` (Rỗng) | Hệ thống chặn submit, highlight ô tiêu đề màu đỏ, thông báo lỗi validation rõ ràng | **P1** | EDG, CHR, FF | **P** | - | - | - |
+| **TC-WF-05** | FR-WF-03 | Duyệt hồ sơ 2 cấp: Đơn vị duyệt -> Cấp trên duyệt | Hồ sơ ở trạng thái `SUBMITTED` | 1. QL đơn vị vào duyệt -> Chuyển `UNIT_APPROVED`<br>2. Cấp trên vào kiểm tra -> Chuyển `FINAL_APPROVED` | Record ID: `REC-2026-001` | Trạng thái chuyển đổi chính xác, nhật ký workflow ghi nhận đầy đủ người duyệt, thời gian | **P0** | EDG, CHR | **F** | **P** | - | DEF-012 |
+| **TC-SEC-05** | NFR-SEC-04 | Kiểm chứng mã hóa dữ liệu nhạy cảm trong CSDL | Đã tạo bản ghi hồ sơ nhân sự/khách hàng | 1. Mở công cụ truy vấn SQL Server/Postgres<br>2. Select các trường CCCD/Điện thoại | Query: `SELECT cccd_plaintext, cccd_cipher, key_version FROM app_profile` | Cột plaintext hoàn toàn rỗng/NULL; cột cipher chứa chuỗi byte mã hóa AES-256; có cột `key_version` | **P0** | DB Tool | **P** | - | - | - |
+| **TC-CD-04** | NFR-OPS-02 | Giải mã dữ liệu thành công sau khi cài đặt mới | Đã triển khai bản build mới lên máy chủ | 1. Kiểm tra biến môi trường mã hóa ở cấp Machine<br>2. Khởi động ứng dụng<br>3. Đăng nhập và mở màn hình xem chi tiết | Tài khoản Quản trị viên | Màn hình hiển thị giải mã rõ ràng, đúng nội dung đã lưu, không phát sinh lỗi CryptographicException | **P0** | CHR | **P** | - | - | - |
+
+---
+
+## IV. Các Trường hợp Kiểm thử Bắt buộc Đạt (Non-Negotiable Invariants)
+
+Bất kỳ trường hợp kiểm thử nào dưới đây không đạt sẽ lập tức dừng quy trình nghiệm thu:
+
+| Mã TC | Tên kiểm thử bất biến | Tiêu chí vượt qua bắt buộc | Kết quả |
+| :--- | :--- | :--- | :---: |
+| **TC-SEC-01** | Kiểm chứng mã hóa CSDL | CSDL không chứa dữ liệu nhạy cảm dạng rõ; cột mã hóa và phiên bản khóa hợp lệ | **ĐẠT** |
+| **TC-RBAC-NEG** | Kiểm chứng chặn vượt quyền | 100% ca kiểm thử tiêu cực (sửa ID đơn vị, đổi tham số quyền) bị chặn tại tầng API | **ĐẠT** |
+| **TC-REP-ROLLUP**| Kiểm chứng khớp số liệu | Số liệu tổng hợp tự động khớp chính xác 100% với số liệu đối chiếu độc lập | **ĐẠT** |
+| **TC-SEC-CLEAN** | Dọn sạch môi trường thật | Không còn tài khoản mẫu, dữ liệu test rác trên cơ sở dữ liệu production | **ĐẠT** |
+| **TC-CD-BOOT** | Khởi động & giải mã sau cài đặt | Cài đặt mới hoặc khởi động lại hoàn tất không lỗi, dịch vụ mã hóa/giải mã thông suốt | **ĐẠT** |
+
+---
+
+## V. Phân loại Lỗi và Quy trình Quản lý Lỗi (Defect Management)
+
+### 5.1 Bảng Phân cấp Mức độ Nghiêm trọng (Severity)
+
+| Mức độ | Định nghĩa | Tiêu chuẩn đóng nghiệm thu |
+| :--- | :--- | :--- |
+| **Mức 1 (Blocker / Critical)** | Hệ thống sập, mất mát dữ liệu, lỗ hổng bảo mật nghiêm trọng, không thể tiếp tục kiểm thử | **Bắt buộc 0 lỗi** |
+| **Mức 2 (Major)** | Tính năng chính không hoạt động đúng nghiệp vụ, không có giải pháp thay thế tạm thời | **Bắt buộc 0 lỗi** |
+| **Mức 3 (Moderate / Minor)** | Lỗi giao diện, thông báo lỗi chưa chuẩn, có giải pháp thay thế tạm thời | Cho phép tối đa [X] lỗi với kế hoạch vá |
+| **Mức 4 (Trivial / Suggestion)**| Đề xuất cải tiến trải nghiệm người dùng, căn chỉnh lề, chính tả | Xem xét ở phiên bản tiếp theo |
+
+---
+
+## VI. Thống kê Kết quả Thực thi Kiểm thử (Test Execution Summary)
+
+| Phân nhóm kết quả | Số lượng Test Cases | Tỷ lệ (%) | Đánh giá nghiệm thu |
 | :--- | :---: | :---: | :--- |
-| **Passed (Đạt)** | 58 | 95.1% | Đạt yêu cầu |
-| **Failed (Không đạt)** | 0 | 0.0% | 100% bug đã được resolve |
-| **Blocked (Bị nghẽn)** | 0 | 0.0% | Không có tính năng bị chặn |
-| **Not Run (Chưa chạy)** | 3 | 4.9% | Tính năng phụ thuộc bên thứ 3 (SMS) |
-| **TỔNG CỘNG** | **61** | **100%** | **HỆ THỐNG ĐỦ ĐIỀU KIỆN UAT** |
+| **Passed (Đạt)** | [XX] | 100.0% | 100% ca kiểm thử cốt lõi đạt yêu cầu |
+| **Failed (Không đạt)** | 0 | 0.0% | 0 lỗi tồn đọng mức 1 và mức 2 |
+| **Pending / Blocked** | 0 | 0.0% | Không có tính năng bị chặn |
+| **TỔNG CỘNG** | **[TỔNG_TC]** | **100%** | **ĐỦ ĐIỀU KIỆN KÝ BIÊN BẢN NGHIỆM THU** |

@@ -5,7 +5,7 @@
 | Thông tin | Giá trị |
 | :--- | :--- |
 | **Tên dự án** | [Tên dự án phần mềm] |
-| **Mã hiệu dự án** | [MÃ-DỰ-ÁN, ví dụ: LPB-EWORK] |
+| **Mã hiệu dự án** | [MÃ-DỰ-ÁN, ví dụ: PRJ-CORE-SVC] |
 | **Mã hiệu tài liệu** | [MÃ-DỰ-ÁN-URD / SRS] |
 | **Phiên bản** | 1.0 |
 | **Ngày ban hành** | YYYY-MM-DD |
@@ -118,7 +118,35 @@ Mỗi chức năng phải được mô tả chi tiết bằng bảng đặc tả
 
 ---
 
-## IV. Yêu cầu phi chức năng (Non-Functional Requirements - NFR)
+## IV. Danh mục Quy tắc Nghiệp vụ Hệ thống (Business Rules Catalog)
+
+Toàn bộ quy tắc cốt lõi của bài toán được chuẩn hóa thành 5 nhóm mã hiệu `BR-xxx`:
+
+### 4.1 Nhóm quy tắc Phân quyền và Phạm vi Dữ liệu (Scope & Permissions - `BR-SCP`)
+- **`BR-SCP-01`**: Mô hình phân quyền theo 4 cấp phạm vi: (1) Toàn hệ thống; (2) Cấp đơn vị quản lý; (3) Cấp đơn vị trực thuộc; (4) Người dùng cơ sở / Cá nhân.
+- **`BR-SCP-02`**: Nguyên tắc thừa kế cây tổ chức: Cấp quản lý được xem và tổng hợp dữ liệu của toàn bộ đơn vị con trực thuộc; đơn vị con tuyệt đối không thể xem dữ liệu của đơn vị ngang hàng hoặc đơn vị cấp trên.
+- **`BR-SCP-03`**: Kiểm soát 2 lớp độc lập: Lớp 1 chặn điều hướng trên UI; Lớp 2 bắt buộc lọc mệnh đề `unit_id IN (...)` tại câu lệnh truy vấn dữ liệu backend (Cấm tuyệt đối chỉ chặn ở giao diện).
+
+### 4.2 Nhóm quy tắc Luồng duyệt và Phân vai (Workflow & Roles - `BR-WF`)
+- **`BR-WF-01`**: Luồng chuyển trạng thái tuần tự: `DRAFT` (Dự thảo) ──► `SUBMITTED` (Đã nộp) ──► `UNIT_APPROVED` (Đơn vị duyệt) ──► `FINAL_APPROVED` (Cấp trên phê duyệt).
+- **`BR-WF-02`**: Quy tắc trả lại hồ sơ: Cấp duyệt có quyền trả lại về trạng thái `REJECTED` kèm nội dung lý do bắt buộc; người lập có quyền sửa và nộp lại.
+- **`BR-WF-03`**: Quy tắc thu hồi (Recall): Người lập chỉ được phép thu hồi hồ sơ khi cấp duyệt chưa xử lý (trạng thái đang `SUBMITTED`).
+
+### 4.3 Nhóm quy tắc Tính toán và Thuật toán Nghiệp vụ (Calculations & Rollups - `BR-CALC`)
+- **`BR-CALC-01`**: Thuật toán tự động tổng hợp số liệu: Cột tổng cộng của đơn vị cấp trên bằng tổng các giá trị chỉ tiêu tương ứng của các đơn vị con đã phê duyệt.
+- **`BR-CALC-02`**: Bảo toàn số liệu tự nhập: Khi đơn vị cấp trên tự nhập số liệu điều chỉnh, hệ thống lưu trữ tại trường riêng và không được phép ghi đè lên số liệu nguyên bản của đơn vị cấp dưới gửi lên.
+
+### 4.4 Nhóm quy tắc Bảo vệ Dữ liệu và Vết kiểm toán (Data Protection & Audit - `BR-SEC`)
+- **`BR-SEC-01`**: Bảo vệ thông tin nhạy cảm: Số định danh cá nhân (CCCD), số điện thoại và thông tin tài chính phải được mã hóa trước khi lưu trữ trong CSDL; tra cứu sử dụng cơ chế Blind Index (HMAC-SHA256).
+- **`BR-SEC-02`**: Tính bất biến của nhật ký kiểm toán: Bản ghi `app_security_audit_log` chỉ cho phép `INSERT`, tuyệt đối không hỗ trợ thao tác `UPDATE` hoặc `DELETE` ngay cả với tài khoản Quản trị cấp cao nhất.
+
+### 4.5 Nhóm quy tắc Toàn vẹn Dữ liệu (Data Integrity - `BR-INT`)
+- **`BR-INT-01`**: Khóa dữ liệu theo kỳ: Khi kỳ báo cáo hoặc kỳ kế toán chuyển trạng thái `CLOSED` (Đã đóng), toàn bộ thao tác thêm, sửa, xóa dữ liệu thuộc kỳ đó bị khóa cứng ở tầng Service.
+- **`BR-INT-02`**: Tính duy nhất trong phạm vi đơn vị: Mã hồ sơ và mã nhân sự không được phép trùng lặp trong cùng một đơn vị và tenant.
+
+---
+
+## V. Yêu cầu phi chức năng (Non-Functional Requirements - NFR)
 
 ### 4.1 Tính tương thích (Compatibility)
 - Hỗ trợ các trình duyệt phổ biến: Google Chrome (bản 90 trở lên), Microsoft Edge, Safari, Firefox.
@@ -143,7 +171,7 @@ Mỗi chức năng phải được mô tả chi tiết bằng bảng đặc tả
 
 ---
 
-## V. Tiêu chuẩn nghiệm thu hệ thống (System Acceptance Criteria)
+## VI. Tiêu chuẩn nghiệm thu hệ thống (System Acceptance Criteria)
 1. 100% chức năng P0 và P1 vượt qua toàn bộ ca kiểm thử chức năng (Functional Test Cases).
 2. Không còn tồn tại lỗi mức độ nghiêm trọng (Blocker/Critical/High) chưa được xử lý.
 3. Hoàn thành đầy đủ bộ tài liệu bàn giao: HLD, LLD, Thiết kế CSDL, Hướng dẫn cài đặt, Hướng dẫn vận hành và Biên bản UAT có chữ ký đại diện các bên.

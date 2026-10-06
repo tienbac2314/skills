@@ -46,10 +46,10 @@ Hướng dẫn kỹ sư vận hành kiểm tra, theo dõi hoạt động hàng n
 | :---: | :--- | :--- | :--- |
 | **1** | CSDL chính (PostgreSQL / Oracle) | `sudo systemctl start postgresql-15`<br>hoặc kiểm tra cluster | `pg_isready -h localhost -p 5432`<br>Trả về `accepting connections` |
 | **2** | Redis Cache & Kafka Queue | `docker start redis-cluster`<br>`docker start kafka-cluster` | `redis-cli ping` trả lời `PONG`<br>`kcat -b localhost:9092 -L` hiển thị topics |
-| **3** | Service Registry (Consul / Eureka) | `docker start ework-registry` | Truy cập Dashboard `http://ip:8761` hiển thị trạng thái UP |
-| **4** | Cụm Core Microservices | `docker start ework-core ework-auth ework-report` | Log hiển thị `Started Application in X seconds`<br>Health endpoint `/actuator/health` trả về `UP` |
-| **5** | API Gateway (Kong / Nginx) | `docker start ework-gateway` | Gọi thử endpoint `/healthz` trả về HTTP 200 |
-| **6** | Web Portal Frontend | `docker start ework-web` | Truy cập trang chủ Web hiển thị màn hình đăng nhập |
+| **3** | Service Registry (Consul / Eureka) | `docker start core-registry` | Truy cập Dashboard `http://ip:8761` hiển thị trạng thái UP |
+| **4** | Cụm Core Microservices | `docker start core-svc auth-svc report-svc` | Log hiển thị `Started Application in X seconds`<br>Health endpoint `/actuator/health` trả về `UP` |
+| **5** | API Gateway (Kong / Nginx) | `docker start api-gateway` | Gọi thử endpoint `/healthz` trả về HTTP 200 |
+| **6** | Web Portal Frontend | `docker start web-portal` | Truy cập trang chủ Web hiển thị màn hình đăng nhập |
 
 ### 2.2 Quy trình Tắt hệ thống (Graceful Shutdown Sequence)
 
@@ -68,7 +68,7 @@ Hướng dẫn kỹ sư vận hành kiểm tra, theo dõi hoạt động hàng n
 
 Kỹ sư vận hành thực hiện kiểm tra vào 08:30 sáng và 16:30 chiều mỗi ngày làm việc:
 
-- [ ] **Kiểm tra trạng thái Service**: Thực hiện lệnh `docker ps` hoặc `kubectl get pods -n ework` đảm bảo 100% pod ở trạng thái `Running` và `Ready`.
+- [ ] **Kiểm tra trạng thái Service**: Thực hiện lệnh `docker ps` hoặc `kubectl get pods -n core-system` đảm bảo 100% pod ở trạng thái `Running` và `Ready`.
 - [ ] **Kiểm tra tài nguyên máy chủ**: Chạy `df -h` kiểm tra phân vùng `/u01` hoặc `/var/lib/docker` đảm bảo dung lượng trống > 20%.
 - [ ] **Kiểm tra log lỗi**: Tra cứu lỗi trên Kibana / Grafana với bộ lọc `level: ERROR` trong 24 giờ qua.
 - [ ] **Kiểm tra đồng bộ CSDL**: Kiểm tra độ trễ sao chép dữ liệu giữa Master và Standby (Replication Lag < 100MB).
